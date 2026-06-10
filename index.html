@@ -16,7 +16,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
 .logo-dot{width:10px;height:10px;background:var(--green);border-radius:50%}
 .api-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface);cursor:pointer}
 .dot{width:7px;height:7px;border-radius:50%;background:#ccc;flex-shrink:0}
-.dot.ok{background:var(--green)}.dot.err{background:var(--red)}
+.dot.ok{background:var(--green)}.dot.err{background:var(--red)}.dot.warn{background:var(--amber)}
 .tabs{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:20px;overflow-x:auto}
 .tab{padding:7px 16px;border-radius:7px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;border:none;background:none;transition:all .15s}
 .tab.active{background:var(--green);color:#fff}
@@ -29,7 +29,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:18p
 .label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
 input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--green)}
-textarea{resize:vertical;min-height:36px}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:inherit;transition:all .15s;white-space:nowrap}
 .btn:hover{background:var(--bg)}.btn:active{transform:scale(.98)}
 .btn-primary{background:var(--green);color:#fff;border-color:var(--green)}
@@ -40,8 +39,13 @@ textarea{resize:vertical;min-height:36px}
 .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center}
 .stat-val{font-size:24px;font-weight:600;line-height:1.1}
 .stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:3px}
-.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;transition:all .15s}
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:32px 20px;text-align:center;cursor:pointer;transition:all .15s;position:relative}
 .upload-zone:hover,.upload-zone.over{border-color:var(--green);background:var(--green-bg)}
+.upload-zone.loading{border-color:var(--amber);background:var(--amber-bg);cursor:wait}
+.upload-zone.done{border-color:var(--green);background:var(--green-bg)}
+.upload-zone.error{border-color:var(--red);background:var(--red-bg)}
+.spinner{display:inline-block;width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
 .b-shared{background:var(--green-bg);color:var(--green)}
 .b-personal{background:var(--red-bg);color:var(--red)}
@@ -73,7 +77,8 @@ tr:hover td{background:var(--bg)}
 .filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
 .filter-bar select{font-size:12px;padding:6px 8px}
 .warn-box{background:var(--amber-bg);border:1px solid var(--amber);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--amber);margin-bottom:12px;display:none}
-.info-box{background:var(--blue-bg);border:1px solid var(--blue);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--blue);margin-bottom:12px}
+.info-box{background:var(--blue-bg);border:1px solid var(--blue);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:12px;line-height:1.6}
+.step-hint{font-size:12px;color:var(--muted);margin-top:6px}
 </style>
 </head>
 <body>
@@ -81,7 +86,8 @@ tr:hover td{background:var(--bg)}
 <header>
   <div class="logo"><div class="logo-dot"></div> Gastos Familiares</div>
   <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-    <div class="api-pill" onclick="switchTab('config')"><div class="dot" id="hDot"></div><span id="hStatus">Sin API key</span></div>
+    <div class="api-pill"><div class="dot" id="swDot"></div><span id="swStatus">Splitwise sin key</span></div>
+    <div class="api-pill"><div class="dot" id="clDot"></div><span id="clStatus">Claude sin key</span></div>
     <button class="btn btn-sm" onclick="switchTab('config')">⚙ Configurar</button>
   </div>
 </header>
@@ -104,48 +110,40 @@ tr:hover td{background:var(--bg)}
   </div>
 
   <div class="card">
-    <div class="card-title">Importar resumen</div>
+    <div class="card-title">Subir resumen</div>
     <div class="row">
-      <div class="field"><div class="label">Fuente</div>
+      <div class="field">
+        <div class="label">Fuente</div>
         <select id="srcType">
           <option value="visa_icbc">Visa ICBC</option>
           <option value="amex">American Express</option>
-          <option value="mp_credito">MercadoPago crédito (CSV)</option>
-          <option value="mp_debito">MercadoPago débito (CSV)</option>
+          <option value="mp_credito">MercadoPago crédito</option>
+          <option value="mp_debito">MercadoPago débito</option>
           <option value="mastercard_mp">Mastercard MercadoPago</option>
-          <option value="manual">Manual</option>
         </select>
       </div>
-      <div class="field"><div class="label">¿Quién pagó?</div>
+      <div class="field">
+        <div class="label">¿Quién pagó?</div>
         <select id="payerSel"><option value="juan">Juan Pablo</option><option value="vicky">Victoria</option></select>
       </div>
     </div>
 
     <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileIn').click()" ondragover="doDragOver(event)" ondragleave="doDragLeave()" ondrop="doDrop(event)">
-      <div style="font-size:28px;margin-bottom:8px">📂</div>
-      <p style="font-weight:500;margin-bottom:4px">Arrastrá el archivo CSV o hacé click</p>
-      <small style="color:var(--muted)">Solo CSV de MercadoPago · Para PDFs usá el campo de texto abajo</small>
-      <input type="file" id="fileIn" style="display:none" accept=".csv" onchange="handleFile(this)">
+      <div id="zoneContent">
+        <div style="font-size:32px;margin-bottom:10px">📄</div>
+        <p style="font-weight:500;font-size:15px;margin-bottom:6px">Arrastrá el archivo o hacé click</p>
+        <p style="font-size:12px;color:var(--muted)">PDF (Visa ICBC, Amex) · CSV (MercadoPago)</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:8px">Los PDFs se procesan automáticamente con Claude AI</p>
+      </div>
+      <input type="file" id="fileIn" style="display:none" accept=".pdf,.csv" onchange="handleFile(this)">
     </div>
     <div id="fileStatus" style="margin-top:10px;font-size:12px;color:var(--muted)"></div>
-  </div>
 
-  <div class="card">
-    <div class="card-title">📋 Pegar texto de PDF (Visa ICBC, Amex, etc.)</div>
-    <div class="info-box">
-      <strong>¿Cómo copiar el texto del PDF?</strong><br>
-      1. Abrí el PDF en Chrome o Adobe<br>
-      2. Ctrl+A (seleccionar todo) → Ctrl+C (copiar)<br>
-      3. Pegá abajo y hacé click en "Procesar"<br>
-      <br>
-      <strong>Importante:</strong> La app filtra automáticamente los caracteres raros del PDF. Solo extrae líneas con fecha y monto válidos.
+    <div id="claudeKeyWarning" class="info-box" style="margin-top:12px;display:none">
+      ⚠️ <strong>Para procesar PDFs necesitás configurar tu API key de Claude.</strong><br>
+      Andá a <strong>⚙ Configurar</strong> → sección "Claude AI" y pegá tu key.<br>
+      La conseguís gratis en <a href="https://console.anthropicic.com" target="_blank">console.anthropic.com</a>
     </div>
-    <textarea id="pdfText" rows="6" placeholder="Pegá aquí el texto completo del PDF...&#10;&#10;Ejemplo de lo que reconoce:&#10;02/05/26 RAPPI   000723K   14662,00&#10;11/05/26 NETFLIX.COM   793556P   25398,00&#10;18/05/26 JUMBO MARTINEZ   169700K   171976,51"></textarea>
-    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-      <button class="btn btn-primary" onclick="parsePdfText()">▶ Procesar texto</button>
-      <button class="btn" onclick="document.getElementById('pdfText').value=''">✕ Limpiar</button>
-    </div>
-    <div id="parseResult" style="margin-top:8px;font-size:12px;color:var(--muted)"></div>
   </div>
 
   <div class="card">
@@ -157,7 +155,8 @@ tr:hover td{background:var(--bg)}
       <div class="field"><div class="label">Moneda</div><select id="m-mon"><option value="ARS">ARS</option><option value="USD">USD</option></select></div>
     </div>
     <div class="row">
-      <div class="field"><div class="label">Categoría</div>
+      <div class="field">
+        <div class="label">Categoría</div>
         <select id="m-cat">
           <option>Supermercado</option><option>Delivery / Comida</option><option>Farmacia</option>
           <option>Auto / Nafta</option><option>Auto / Estacionamiento</option><option>Mascotas</option>
@@ -236,12 +235,12 @@ tr:hover td{background:var(--bg)}
 <!-- CONFIG -->
 <div class="section" id="sec-config">
   <div class="card">
-    <div class="card-title">Conexión Splitwise</div>
+    <div class="card-title">Splitwise</div>
     <div class="cfg-row">
-      <div class="cfg-lbl"><p>API Key</p><small>Obtené tu key en <a href="https://www.splitwise.com/apps" target="_blank">splitwise.com/apps</a></small></div>
+      <div class="cfg-lbl"><p>API Key de Splitwise</p><small>Obtené tu key en <a href="https://www.splitwise.com/apps" target="_blank">splitwise.com/apps</a></small></div>
       <div style="display:flex;gap:6px;align-items:center">
-        <input type="password" id="apiIn" placeholder="tu-api-key-aquí" style="width:240px;font-size:12px">
-        <button class="btn btn-sm btn-primary" onclick="saveKey()">Guardar</button>
+        <input type="password" id="swKeyIn" placeholder="splitwise-api-key" style="width:240px;font-size:12px">
+        <button class="btn btn-sm btn-primary" onclick="saveSwKey()">Guardar</button>
       </div>
     </div>
     <div class="cfg-row">
@@ -258,6 +257,22 @@ tr:hover td{background:var(--bg)}
       </label>
     </div>
   </div>
+
+  <div class="card">
+    <div class="card-title">Claude AI — Procesamiento de PDFs</div>
+    <div class="info-box">
+      Claude lee los PDFs de Visa ICBC, Amex y otros aunque sean imágenes escaneadas.<br>
+      Conseguí tu API key gratis en <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys → Create Key
+    </div>
+    <div class="cfg-row">
+      <div class="cfg-lbl"><p>API Key de Claude</p><small>Empieza con "sk-ant-..."</small></div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="password" id="clKeyIn" placeholder="sk-ant-api03-..." style="width:240px;font-size:12px">
+        <button class="btn btn-sm btn-primary" onclick="saveClKey()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-title">Reglas de clasificación automática</div>
     <div id="rulesList"></div>
@@ -278,20 +293,20 @@ tr:hover td{background:var(--bg)}
 
 <script>
 let expenses = [];
-let apiKey = localStorage.getItem('sw_api_key') || '';
+let swKey   = localStorage.getItem('sw_api_key') || '';
+let clKey   = localStorage.getItem('cl_api_key') || '';
 let selectedGroup = localStorage.getItem('sw_group') || '';
-let groups = [];
-let rules = JSON.parse(localStorage.getItem('sw_rules') || 'null') || [
+let groups  = [];
+let rules   = JSON.parse(localStorage.getItem('sw_rules') || 'null') || [
   {kw:'RAPPI',t:'shared'},{kw:'JUMBO',t:'shared'},{kw:'CARREFOUR',t:'shared'},{kw:'DISCO',t:'shared'},
-  {kw:'COTO',t:'shared'},{kw:'DIA ',t:'shared'},{kw:'SHELL',t:'shared'},{kw:'YPF',t:'shared'},
-  {kw:'PUMA',t:'shared'},{kw:'CITYPET',t:'shared'},{kw:'CITY PET',t:'shared'},
-  {kw:'NETFLIX',t:'shared'},{kw:'FARMACIA',t:'shared'},{kw:'FARMA',t:'shared'},
-  {kw:'COLEGIO',t:'shared'},{kw:'DIONI',t:'shared'},{kw:'YOUTUBE',t:'shared'},
-  {kw:'MICROSOFT',t:'shared'},{kw:'PRIMEVIDEO',t:'shared'},{kw:'PARKINGDOT',t:'shared'},
-  {kw:'PARKING',t:'shared'},{kw:'PEAJE',t:'shared'},{kw:'BLOSOM',t:'shared'},
-  {kw:'SHOWCASE',t:'shared'},{kw:'FRIGCAPARRO',t:'shared'},{kw:'MULTICANNING',t:'shared'},
-  {kw:'MI FARMA',t:'shared'},{kw:'MAQUERA',t:'shared'},{kw:'LANZAVECCHIA',t:'shared'},
-  {kw:'STARBUCKS',t:'shared'},{kw:'MCDONALDS',t:'shared'},{kw:'MC DONALDS',t:'shared'},
+  {kw:'COTO',t:'shared'},{kw:'SHELL',t:'shared'},{kw:'YPF',t:'shared'},{kw:'PUMA',t:'shared'},
+  {kw:'CITYPET',t:'shared'},{kw:'CITY PET',t:'shared'},{kw:'NETFLIX',t:'shared'},
+  {kw:'FARMACIA',t:'shared'},{kw:'FARMA',t:'shared'},{kw:'COLEGIO',t:'shared'},
+  {kw:'DIONI',t:'shared'},{kw:'YOUTUBE',t:'shared'},{kw:'MICROSOFT',t:'shared'},
+  {kw:'PRIMEVIDEO',t:'shared'},{kw:'PARKINGDOT',t:'shared'},{kw:'PARKING',t:'shared'},
+  {kw:'PEAJE',t:'shared'},{kw:'BLOSOM',t:'shared'},{kw:'SHOWCASE',t:'shared'},
+  {kw:'FRIGCAPARRO',t:'shared'},{kw:'MULTICANNING',t:'shared'},{kw:'MI FARMA',t:'shared'},
+  {kw:'MAQUERA',t:'shared'},{kw:'LANZAVECCHIA',t:'shared'},{kw:'STARBUCKS',t:'shared'},
   {kw:'UBER',t:'shared'},{kw:'CABIFY',t:'shared'},{kw:'TOYOTA',t:'shared'},
   {kw:'STEAM',t:'personal'},{kw:'ADOBE',t:'personal'},{kw:'ADIDAS',t:'personal'},
   {kw:'G-SHOCK',t:'personal'},{kw:'ZARA',t:'personal'},{kw:'TIDAL',t:'personal'},
@@ -309,141 +324,172 @@ function classify(desc){
 
 function cleanDesc(raw){
   return (raw||'')
-    .replace(/MERPAGO\*/gi,'')
-    .replace(/PROPINA\*/gi,'Propina ')
-    .replace(/DLO\*/gi,'')
-    .replace(/PAYU\*AR\*/gi,'')
-    .replace(/DSA-FCIA /gi,'')
-    .replace(/MERPAGO/gi,'')
-    .replace(/C\.\d+\/\d+/g,'')
-    .replace(/\b\d{6,}\*?\b/g,'')
-    .replace(/\bMT1F\b/g,'')
-    .replace(/\bUSD\b/g,'')
-    .replace(/\s{2,}/g,' ')
-    .trim();
+    .replace(/MERPAGO\*/gi,'').replace(/PROPINA\*/gi,'Propina ').replace(/DLO\*/gi,'')
+    .replace(/PAYU\*AR\*/gi,'').replace(/DSA-FCIA /gi,'').replace(/MERPAGO/gi,'')
+    .replace(/C\.\d+\/\d+/g,'').replace(/\b\d{6,}\*?\b/g,'').replace(/\bMT1F\b/g,'')
+    .replace(/\bUSD\b/g,'').replace(/\s{2,}/g,' ').trim();
 }
 
-// ── PDF text parser ──────────────────────────────────────────────────────────
-function parsePdfText(){
-  const raw = document.getElementById('pdfText').value;
-  if(!raw.trim()){ toast('Pegá el texto primero','warn'); return; }
+// ── PDF via Claude API ───────────────────────────────────────────────────────
+function setZoneState(state, msg, sub){
+  const zone = document.getElementById('dropZone');
+  zone.className = 'upload-zone ' + (state||'');
+  const icons = {loading:'<div class="spinner"></div>', done:'<div style="font-size:32px;margin-bottom:10px">✅</div>', error:'<div style="font-size:32px;margin-bottom:10px">❌</div>'};
+  document.getElementById('zoneContent').innerHTML =
+    (icons[state]||'<div style="font-size:32px;margin-bottom:10px">📄</div>') +
+    `<p style="font-weight:500;font-size:15px;margin-bottom:6px">${msg}</p>` +
+    (sub?`<p style="font-size:12px;color:var(--muted)">${sub}</p>`:'');
+}
 
-  const payer = document.getElementById('payerSel').value;
-  const src   = document.getElementById('srcType').value;
-  const lines = raw.split('\n');
-  let added = 0, skipped = 0;
+async function processPdfWithClaude(base64Data, fname, src, payer){
+  if(!clKey){
+    document.getElementById('claudeKeyWarning').style.display='block';
+    setZoneState('error','Falta la API key de Claude','Configurá la key en ⚙ Configurar');
+    return;
+  }
+  setZoneState('loading','Leyendo el PDF con Claude AI...','Esto puede tardar 15-30 segundos');
 
-  // Regex para fecha Argentina/resumenes bancarios: DD/MM/YY o DD/MM/YYYY
-  const dateRe  = /\b(\d{2}\/\d{2}\/\d{2,4})\b/;
-  // Importe: número con puntos de miles y coma decimal, ej: 1.234.567,89 o 14662,00
-  const impRe   = /\b(\d{1,3}(?:\.\d{3})*,\d{2})\b(?![\d])/g;
-  // Filtro de líneas basura: si >40% de los chars son no-ASCII, descartamos
-  const garbageRe = /[^\x00-\x7F]/g;
+  const rulesCtx = rules.map(r=>`"${r.kw}" → ${r.t==='shared'?'compartido':r.t==='personal'?'personal':'revisar'}`).join(', ');
 
-  lines.forEach(line => {
-    // Limpiar la línea de caracteres no-ASCII
-    const cleaned = line.replace(garbageRe, ' ').replace(/\s{2,}/g,' ').trim();
-    if(cleaned.length < 6) return;
+  const prompt = `Sos un asistente que extrae movimientos de resúmenes de tarjeta de crédito argentinos.
 
-    // Filtrar líneas con >30% chars raros en el original
-    const nonAscii = (line.match(/[^\x00-\x7F]/g)||[]).length;
-    if(nonAscii / line.length > 0.3){ skipped++; return; }
+Del PDF adjunto extraé TODOS los consumos/gastos. Ignorá: saldo anterior, pagos del titular, devoluciones de impuestos (importes negativos), intereses, IIBB, IVA sobre financiación, y cualquier cargo bancario que no sea un consumo real.
 
-    // Necesitamos fecha
-    const dm = cleaned.match(dateRe);
-    if(!dm) return;
+Para cada consumo devolvé EXACTAMENTE este formato JSON (un array):
+[
+  {"fecha":"DD/MM/AA","desc":"Nombre limpio del comercio","importe":1234.56,"moneda":"ARS","cuota":""},
+  ...
+]
 
-    // Detectar si es USD
-    const isUSD = /\bUSD\b/i.test(cleaned);
+Reglas para el campo "desc": nombre corto y legible para Splitwise. Ej: "Super Jumbo Martínez", "Rappi cena", "Netflix", "Farmacia Schwart".
+Para cuotas indicá "2/3" si es cuota 2 de 3, o dejá vacío si es pago único.
+Para gastos en USD usá moneda "USD".
+No incluyas gastos con importe negativo.
+Devolvé SOLO el JSON, sin texto adicional, sin markdown, sin explicaciones.`;
 
-    // Extraer todos los importes de la línea, tomar el mayor (suele ser el monto)
-    let bestImp = 0;
-    let m;
-    impRe.lastIndex = 0;
-    while((m = impRe.exec(cleaned)) !== null){
-      const v = parseFloat(m[1].replace(/\./g,'').replace(',','.'));
-      if(v > bestImp) bestImp = v;
-    }
-    if(!bestImp || bestImp <= 0) return;
-
-    // Ignorar si es pago/saldo/ajuste/devolución
-    const upperLine = cleaned.toUpperCase();
-    if(/SALDO ANTERIOR|SU PAGO|PAGO EN|INTERESES|DB IVA|IIBB|IVA RG|DB\.RG|DEV\.IMP|PERCEP|FINANCIACION/.test(upperLine)) return;
-    // Ignorar importes negativos (devoluciones) — líneas con "-" al final del monto
-    if(/\d,\d{2}-/.test(cleaned)) return;
-
-    // Extraer descripción: todo entre la fecha y el primer número grande
-    let desc = cleaned
-      .replace(dm[0],'')                    // quitar fecha
-      .replace(/\b[A-Z0-9]{6,}\*?\b/g,' ')  // quitar comprobantes (6+ chars alfanum)
-      .replace(/\b\d{1,3}(?:\.\d{3})*,\d{2}\b/g,' ') // quitar montos
-      .replace(/\bC\.\d+\/\d+\b/g,'')       // quitar cuotas "C.02/03"
-      .replace(/\bMT1F\b/gi,'')
-      .replace(/\bUSD\b/gi,'')
-      .replace(/[-–]\s*$/, '')
-      .replace(/\s{2,}/g,' ')
-      .trim();
-
-    if(!desc || desc.length < 2) return;
-
-    // Normalizar fecha a YYYY-MM-DD
-    const parts = dm[1].split('/');
-    let year = parts[2]; if(year.length===2) year='20'+year;
-    const fecha = `${year}-${parts[1]}-${parts[0]}`;
-
-    addExpense({
-      id: Date.now() + Math.random(),
-      fecha, desc: cleanDesc(desc), original: desc,
-      importe: bestImp, moneda: isUSD ? 'USD' : 'ARS',
-      status: classify(desc), categoria: 'Otro',
-      source: src, payer, sent: false
+  try{
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': clKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64Data } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
     });
-    added++;
-  });
 
-  const msg = `✓ ${added} gastos extraídos${skipped?' · '+skipped+' líneas descartadas (texto ilegible)':''}`;
-  document.getElementById('parseResult').textContent = msg;
-  if(added > 0){
-    toast(added + ' gastos importados','ok');
-  } else {
-    toast('No se encontraron movimientos válidos. Probá con el selector de cuota debajo.','warn');
-    document.getElementById('parseResult').innerHTML =
-      '<span style="color:var(--red)">No se encontraron líneas con fecha + importe. Revisá que el texto tenga el formato correcto o cargalos manualmente.</span>';
+    if(!response.ok){
+      const err = await response.json();
+      throw new Error((err.error&&err.error.message)||'Error '+response.status);
+    }
+
+    const data = await response.json();
+    const raw  = data.content.map(b=>b.text||'').join('');
+    // strip possible markdown fences
+    const jsonStr = raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    const items = JSON.parse(jsonStr);
+
+    let added = 0;
+    items.forEach((item, i)=>{
+      if(!item.desc || !item.importe || item.importe <= 0) return;
+      const nota = item.cuota ? `Cuota ${item.cuota}` : '';
+      addExpense({
+        id: Date.now()+i+Math.random(),
+        fecha: normalizeFecha(item.fecha),
+        desc: item.desc,
+        original: item.desc + (nota?' ('+nota+')':''),
+        importe: parseFloat(item.importe),
+        moneda: item.moneda||'ARS',
+        status: classify(item.desc),
+        categoria: 'Otro',
+        source: src + ' · ' + fname,
+        payer, sent: false,
+        nota
+      });
+      added++;
+    });
+
+    setZoneState('done', `✓ ${added} gastos extraídos de ${fname}`, 'Revisalos en el paso 2');
+    document.getElementById('fileStatus').textContent = '';
+    toast(added+' gastos importados desde el PDF','ok');
+
+  } catch(e){
+    setZoneState('error','Error al procesar el PDF', e.message.slice(0,80));
+    toast('Error Claude: '+e.message,'err');
+    console.error(e);
   }
 }
 
-// ── CSV ──────────────────────────────────────────────────────────────────────
-function handleFile(inp){
-  const f = inp.files[0]; if(!f) return;
-  document.getElementById('fileStatus').textContent = 'Procesando: '+f.name+'...';
-  const reader = new FileReader();
-  reader.onload = e => parseCSV(e.target.result, f.name);
-  reader.readAsText(f,'UTF-8');
+function normalizeFecha(str){
+  if(!str) return new Date().toISOString().slice(0,10);
+  const p = str.split('/');
+  if(p.length===3){
+    let y = p[2]; if(y.length===2) y='20'+y;
+    return `${y}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+  }
+  return str;
 }
 
-function parseCSV(text, fname){
-  const lines = text.split('\n').filter(l=>l.trim());
-  const sep = text.includes(';') ? ';' : ',';
-  let added = 0;
-  const src = document.getElementById('srcType').value;
+// ── File handler ─────────────────────────────────────────────────────────────
+function handleFile(inp){
+  const f = inp.files[0]; if(!f) return;
+  const src   = document.getElementById('srcType').value;
   const payer = document.getElementById('payerSel').value;
+
+  if(f.name.toLowerCase().endsWith('.pdf')){
+    if(!clKey){
+      document.getElementById('claudeKeyWarning').style.display='block';
+      setZoneState('error','Falta la API key de Claude','Configurala en ⚙ Configurar → sección Claude AI');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const base64 = e.target.result.split(',')[1];
+      processPdfWithClaude(base64, f.name, src, payer);
+    };
+    reader.readAsDataURL(f);
+  } else if(f.name.toLowerCase().endsWith('.csv')){
+    const reader = new FileReader();
+    reader.onload = e => parseCSV(e.target.result, f.name, src, payer);
+    reader.readAsText(f,'UTF-8');
+  } else {
+    toast('Formato no soportado. Usá PDF o CSV.','warn');
+  }
+  inp.value='';
+}
+
+// ── CSV ──────────────────────────────────────────────────────────────────────
+function parseCSV(text, fname, src, payer){
+  const lines = text.split('\n').filter(l=>l.trim());
+  const sep   = text.includes(';') ? ';' : ',';
+  let added   = 0;
   lines.forEach((line,i)=>{
     if(i===0) return;
     const c = line.split(sep).map(x=>x.replace(/"/g,'').trim());
     if(c.length < 3) return;
-    const fecha = c[0]||'';
-    const desc = c[1]||c[2]||'';
     const impStr = (c[3]||c[2]||'').replace(/\./g,'').replace(',','.');
-    const imp = parseFloat(impStr)||0;
+    const imp    = parseFloat(impStr)||0;
     if(!imp||imp<0) return;
     addExpense({
-      id: Date.now()+i, fecha, desc: cleanDesc(desc), original: desc,
-      importe: imp, moneda:'ARS', status: classify(desc),
+      id: Date.now()+i, fecha: normalizeFecha(c[0]),
+      desc: cleanDesc(c[1]||c[2]||''), original: c[1]||c[2]||'',
+      importe: imp, moneda:'ARS', status: classify(c[1]||c[2]||''),
       categoria:'Otro', source: src+' · '+fname, payer, sent:false
     });
     added++;
   });
-  document.getElementById('fileStatus').textContent = '✓ '+added+' movimientos de '+fname;
+  setZoneState('done','✓ '+added+' gastos importados de '+fname,'Revisalos en el paso 2');
   toast(added+' gastos importados','ok');
 }
 
@@ -466,8 +512,7 @@ function addManual(){
     status:document.getElementById('m-shared').checked?'shared':'personal',
     categoria:document.getElementById('m-cat').value, source:'Manual', payer:'juan', sent:false
   });
-  document.getElementById('m-desc').value='';
-  document.getElementById('m-imp').value='';
+  document.getElementById('m-desc').value=''; document.getElementById('m-imp').value='';
   toast('Gasto agregado','ok');
 }
 
@@ -483,35 +528,34 @@ function updateStats(){
 
 // ── Table ────────────────────────────────────────────────────────────────────
 function renderTable(){
-  const sf  = document.getElementById('fStatus').value;
-  const ss  = document.getElementById('fSource').value;
-  let rows  = expenses;
-  if(sf!=='all') rows = rows.filter(e=>sf==='sent'?e.sent:e.status===sf);
-  if(ss!=='all') rows = rows.filter(e=>e.source===ss);
+  const sf = document.getElementById('fStatus').value;
+  const ss = document.getElementById('fSource').value;
+  let rows = expenses;
+  if(sf!=='all') rows=rows.filter(e=>sf==='sent'?e.sent:e.status===sf);
+  if(ss!=='all') rows=rows.filter(e=>e.source===ss);
 
-  const srcs = [...new Set(expenses.map(e=>e.source))];
-  const fsel = document.getElementById('fSource');
-  const cur  = fsel.value;
-  fsel.innerHTML = '<option value="all">Todas las fuentes</option>';
-  srcs.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s.slice(0,35); if(s===cur)o.selected=true; fsel.appendChild(o); });
+  const srcs=[...new Set(expenses.map(e=>e.source))];
+  const fsel=document.getElementById('fSource'); const cur=fsel.value;
+  fsel.innerHTML='<option value="all">Todas las fuentes</option>';
+  srcs.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s.slice(0,35);if(s===cur)o.selected=true;fsel.appendChild(o);});
 
-  const reviewCount = expenses.filter(e=>e.status==='review'&&!e.sent).length;
-  const wb = document.getElementById('warnBox');
-  if(reviewCount>0){ wb.style.display='block'; wb.textContent='⚠ '+reviewCount+' gastos marcados como "Revisar" — revisalos antes de enviar a Splitwise.'; }
-  else { wb.style.display='none'; }
+  const rc=expenses.filter(e=>e.status==='review'&&!e.sent).length;
+  const wb=document.getElementById('warnBox');
+  if(rc>0){wb.style.display='block';wb.textContent='⚠ '+rc+' gastos marcados como "Revisar" — revisalos antes de enviar.';}
+  else wb.style.display='none';
 
-  const tbody = document.getElementById('expBody');
+  const tbody=document.getElementById('expBody');
   tbody.innerHTML='';
-  document.getElementById('emptyMsg').style.display = rows.length?'none':'block';
-  document.getElementById('expTable').style.display = rows.length?'':'none';
+  document.getElementById('emptyMsg').style.display=rows.length?'none':'block';
+  document.getElementById('expTable').style.display=rows.length?'':'none';
 
   rows.forEach(e=>{
-    const tr = document.createElement('tr');
-    const badge = e.sent?'<span class="badge b-sent">Enviado</span>':
+    const tr=document.createElement('tr');
+    const badge=e.sent?'<span class="badge b-sent">Enviado</span>':
       e.status==='shared'?'<span class="badge b-shared">Compartido</span>':
       e.status==='personal'?'<span class="badge b-personal">Personal</span>':
       '<span class="badge b-review">Revisar</span>';
-    const fd = e.fecha ? e.fecha.slice(5).split('-').reverse().join('/') : '';
+    const fd=e.fecha?e.fecha.slice(5).split('-').reverse().join('/') :'';
     tr.innerHTML=`
       <td><input type="checkbox" class="rchk chk-s" data-id="${e.id}"></td>
       <td style="white-space:nowrap">${esc(fd)}</td>
@@ -526,56 +570,54 @@ function renderTable(){
   });
 }
 
-function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function setShared(id,v){ const e=expenses.find(x=>x.id===id); if(e){e.status=v?'shared':'personal';updateStats();} }
-function upd(id,f,v){ const e=expenses.find(x=>x.id===id); if(e) e[f]=v; }
-function toggleAll(c){ document.querySelectorAll('.rchk').forEach(x=>x.checked=c.checked); }
-function bulkSet(shared){ expenses.forEach(e=>{if(!e.sent)e.status=shared?'shared':'personal';}); updateStats();renderTable(); }
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function setShared(id,v){const e=expenses.find(x=>x.id===id);if(e){e.status=v?'shared':'personal';updateStats();}}
+function upd(id,f,v){const e=expenses.find(x=>x.id===id);if(e)e[f]=v;}
+function toggleAll(c){document.querySelectorAll('.rchk').forEach(x=>x.checked=c.checked);}
+function bulkSet(shared){expenses.forEach(e=>{if(!e.sent)e.status=shared?'shared':'personal';});updateStats();renderTable();}
 function deleteSelected(){
   const ids=new Set([...document.querySelectorAll('.rchk:checked')].map(c=>parseInt(c.dataset.id)));
   if(!ids.size){toast('Seleccioná gastos primero','warn');return;}
-  expenses=expenses.filter(e=>!ids.has(e.id));
-  updateStats();renderTable();
+  expenses=expenses.filter(e=>!ids.has(e.id));updateStats();renderTable();
   toast(ids.size+' gastos eliminados','ok');
 }
 
 // ── Push ─────────────────────────────────────────────────────────────────────
 function renderPush(){
-  const toSend = expenses.filter(e=>e.status==='shared'&&!e.sent);
-  const ok = !!apiKey;
+  const toSend=expenses.filter(e=>e.status==='shared'&&!e.sent);
+  const ok=!!swKey;
   document.getElementById('pDot').className='dot '+(ok?'ok':'err');
   document.getElementById('pStatus').textContent=ok?'API conectada':'Sin API key';
   document.getElementById('btnPush').disabled=!ok||!toSend.length;
-  const arsTotal=toSend.filter(e=>e.moneda==='ARS').reduce((s,e)=>s+e.importe,0);
-  const usdTotal=toSend.filter(e=>e.moneda==='USD').reduce((s,e)=>s+e.importe,0);
+  const arsT=toSend.filter(e=>e.moneda==='ARS').reduce((s,e)=>s+e.importe,0);
+  const usdT=toSend.filter(e=>e.moneda==='USD').reduce((s,e)=>s+e.importe,0);
   const grpName=selectedGroup?(groups.find(g=>String(g.id)===selectedGroup)||{name:'Grupo seleccionado'}).name:'Sin grupo';
   document.getElementById('pushPreview').innerHTML=toSend.length?
     `<div class="stats" style="margin-bottom:12px">
       <div class="stat"><div class="stat-val">${toSend.length}</div><div class="stat-lbl">A enviar</div></div>
-      <div class="stat"><div class="stat-val" style="font-size:16px">$${arsTotal.toLocaleString('es-AR',{maximumFractionDigits:0})}</div><div class="stat-lbl">Total ARS</div></div>
-      ${usdTotal?`<div class="stat"><div class="stat-val" style="font-size:16px">U$S ${usdTotal.toFixed(2)}</div><div class="stat-lbl">USD</div></div>`:''}
+      <div class="stat"><div class="stat-val" style="font-size:16px">$${arsT.toLocaleString('es-AR',{maximumFractionDigits:0})}</div><div class="stat-lbl">Total ARS</div></div>
+      ${usdT?`<div class="stat"><div class="stat-val" style="font-size:16px">U$S ${usdT.toFixed(2)}</div><div class="stat-lbl">USD</div></div>`:''}
       <div class="stat"><div class="stat-val" style="font-size:14px">${esc(grpName)}</div><div class="stat-lbl">Grupo</div></div>
-    </div>
-    <p style="font-size:12px;color:var(--muted)">Cada gasto se crea al 50/50. ${!ok?'<strong style="color:var(--red)">Configurá la API key primero.</strong>':''}</p>`:
+    </div><p style="font-size:12px;color:var(--muted)">Cada gasto al 50/50.${!ok?' <strong style="color:var(--red)">Configurá la API key de Splitwise.</strong>':''}</p>`:
     '<p style="color:var(--muted);font-size:13px">No hay gastos compartidos pendientes.</p>';
 }
 
 async function testConn(){
-  if(!apiKey){toast('Configurá la API key primero','warn');return;}
+  if(!swKey){toast('Configurá la API key de Splitwise','warn');return;}
   toast('Conectando…','info');
   try{
-    const r=await fetch('https://secure.splitwise.com/api/v3.0/get_current_user',{headers:{Authorization:'Bearer '+apiKey}});
+    const r=await fetch('https://secure.splitwise.com/api/v3.0/get_current_user',{headers:{Authorization:'Bearer '+swKey}});
     if(r.ok){const d=await r.json();toast('Conectado: '+d.user.first_name+' '+d.user.last_name,'ok');}
     else toast('Error '+r.status+': verificá la API key','err');
   }catch(e){toast('Error: '+e.message,'err');}
 }
 
 async function loadGroups(){
-  if(!apiKey){toast('Configurá la API key primero','warn');return;}
+  if(!swKey){toast('Configurá la API key de Splitwise','warn');return;}
   try{
-    const r=await fetch('https://secure.splitwise.com/api/v3.0/get_groups',{headers:{Authorization:'Bearer '+apiKey}});
+    const r=await fetch('https://secure.splitwise.com/api/v3.0/get_groups',{headers:{Authorization:'Bearer '+swKey}});
     if(r.ok){
-      const d=await r.json(); groups=d.groups||[];
+      const d=await r.json();groups=d.groups||[];
       const sel=document.getElementById('groupSel');
       sel.innerHTML='<option value="">— elegí un grupo —</option>';
       groups.forEach(g=>{const o=document.createElement('option');o.value=g.id;o.textContent=g.name;if(String(g.id)===selectedGroup)o.selected=true;sel.appendChild(o);});
@@ -588,10 +630,10 @@ async function loadGroups(){
 async function pushAll(){
   const toSend=expenses.filter(e=>e.status==='shared'&&!e.sent);
   if(!toSend.length){toast('Nada para enviar','warn');return;}
-  if(!apiKey){toast('Configurá la API key','warn');return;}
+  if(!swKey){toast('Configurá la API key de Splitwise','warn');return;}
   if(!selectedGroup){toast('Seleccioná un grupo en ⚙ Configurar','warn');return;}
   document.getElementById('logCard').style.display='block';
-  const log=document.getElementById('logBox'); log.innerHTML='';
+  const log=document.getElementById('logBox');log.innerHTML='';
   document.getElementById('btnPush').disabled=true;
   let ok=0,fail=0;
   for(let i=0;i<toSend.length;i++){
@@ -607,7 +649,7 @@ async function pushAll(){
       body['users__1__user_id']=members[1].id;body['users__1__paid_amount']='0.00';body['users__1__owed_amount']=half;
     } else { body.split_equally=true; }
     try{
-      const r=await fetch('https://secure.splitwise.com/api/v3.0/create_expense',{method:'POST',headers:{Authorization:'Bearer '+apiKey,'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const r=await fetch('https://secure.splitwise.com/api/v3.0/create_expense',{method:'POST',headers:{Authorization:'Bearer '+swKey,'Content-Type':'application/json'},body:JSON.stringify(body)});
       const d=await r.json();
       if(r.ok&&d.expenses&&d.expenses.length){e.sent=true;ok++;log.innerHTML+=`<span style="color:var(--green)">✓ ${esc(e.desc)} — $${e.importe.toLocaleString('es-AR')}</span>\n`;}
       else{fail++;log.innerHTML+=`<span style="color:var(--red)">✗ ${esc(e.desc)}: ${JSON.stringify((d.errors||d)).slice(0,80)}</span>\n`;}
@@ -631,15 +673,21 @@ function exportCSV(){
 }
 
 // ── Config ───────────────────────────────────────────────────────────────────
-function saveKey(){
-  apiKey=document.getElementById('apiIn').value.trim();
-  if(apiKey){localStorage.setItem('sw_api_key',apiKey);updateApiUI();toast('API key guardada','ok');loadGroups();}
-  else toast('API key vacía','warn');
+function saveSwKey(){
+  swKey=document.getElementById('swKeyIn').value.trim();
+  if(swKey){localStorage.setItem('sw_api_key',swKey);updateApiUI();toast('API key de Splitwise guardada','ok');loadGroups();}
+  else toast('Key vacía','warn');
+}
+function saveClKey(){
+  clKey=document.getElementById('clKeyIn').value.trim();
+  if(clKey){localStorage.setItem('cl_api_key',clKey);updateApiUI();document.getElementById('claudeKeyWarning').style.display='none';toast('API key de Claude guardada','ok');}
+  else toast('Key vacía','warn');
 }
 function updateApiUI(){
-  const ok=!!apiKey;
-  document.getElementById('hDot').className='dot '+(ok?'ok':'err');
-  document.getElementById('hStatus').textContent=ok?'API conectada':'Sin API key';
+  document.getElementById('swDot').className='dot '+(swKey?'ok':'err');
+  document.getElementById('swStatus').textContent=swKey?'Splitwise OK':'Splitwise sin key';
+  document.getElementById('clDot').className='dot '+(clKey?'ok':'err');
+  document.getElementById('clStatus').textContent=clKey?'Claude OK':'Claude sin key';
 }
 function renderRules(){
   const div=document.getElementById('rulesList');div.innerHTML='';
@@ -665,9 +713,9 @@ function switchTab(t){
   document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',names[i]===t));
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById('sec-'+t).classList.add('active');
-  if(t==='review') renderTable();
-  if(t==='push') renderPush();
-  if(t==='config') renderRules();
+  if(t==='review')renderTable();
+  if(t==='push')renderPush();
+  if(t==='config')renderRules();
 }
 
 function toast(msg,type='info'){
@@ -677,8 +725,9 @@ function toast(msg,type='info'){
   clearTimeout(t._to);t._to=setTimeout(()=>t.classList.remove('show'),3500);
 }
 
-if(apiKey) document.getElementById('apiIn').value=apiKey;
-updateApiUI();renderTable();
+if(swKey) document.getElementById('swKeyIn').value=swKey;
+if(clKey) document.getElementById('clKeyIn').value=clKey;
+updateApiUI(); renderTable();
 </script>
 </body>
 </html>
