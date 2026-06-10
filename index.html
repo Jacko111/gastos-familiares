@@ -265,13 +265,48 @@ tr:hover td{background:var(--bg)}
       Conseguí tu API key gratis en <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys → Create Key
     </div>
     <div class="cfg-row">
-      <div class="cfg-lbl"><p>API Key de Claude</p><small>Empieza con "sk-ant-..."</small></div>
+      <div class="cfg-lbl">
+        <p>API Key de Claude</p>
+        <small>Empieza con "sk-ant-..." · <a href="#" onclick="showClModal();return false;" style="color:var(--green);text-decoration:underline;text-underline-offset:2px">¿De dónde la saco?</a></small>
+      </div>
       <div style="display:flex;gap:6px;align-items:center">
         <input type="password" id="clKeyIn" placeholder="sk-ant-api03-..." style="width:240px;font-size:12px">
         <button class="btn btn-sm btn-primary" onclick="saveClKey()">Guardar</button>
       </div>
     </div>
   </div>
+
+<!-- MODAL API KEY CLAUDE -->
+<div id="clModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:480px;width:100%;padding:28px;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+    <button onclick="hideClModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);line-height:1">✕</button>
+    <div style="font-size:28px;margin-bottom:12px">🤖</div>
+    <h3 style="font-size:17px;font-weight:600;margin-bottom:6px">¿Cómo obtengo la API key de Claude?</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">La app la usa para leer los PDFs de tus tarjetas automáticamente, incluso si son imágenes escaneadas.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:26px;height:26px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:1px">1</div>
+        <div><p style="font-size:13px;font-weight:500">Entrá a console.anthropic.com</p><p style="font-size:12px;color:var(--muted)">Creá una cuenta gratuita si no tenés una.</p></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:26px;height:26px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:1px">2</div>
+        <div><p style="font-size:13px;font-weight:500">Menú izquierdo → "API Keys"</p><p style="font-size:12px;color:var(--muted)">Lo encontrás en la barra lateral después de iniciar sesión.</p></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:26px;height:26px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:1px">3</div>
+        <div><p style="font-size:13px;font-weight:500">Click en "Create Key"</p><p style="font-size:12px;color:var(--muted)">Poné un nombre como "Gastos familiares".</p></div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div style="min-width:26px;height:26px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:1px">4</div>
+        <div><p style="font-size:13px;font-weight:500">Copiá la key y pegala acá</p><p style="font-size:12px;color:var(--muted)">Empieza con <code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:11px">sk-ant-...</code> — guardala porque no la vas a poder ver de nuevo.</p></div>
+      </div>
+    </div>
+    <div style="background:var(--amber-bg);border:1px solid var(--amber);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--amber);margin-bottom:20px">
+      💡 Anthropic da créditos gratis al registrarte. Procesar un PDF de resumen de tarjeta cuesta menos de $0,05 USD.
+    </div>
+    <a href="https://console.anthropic.com/settings/keys" target="_blank" style="display:block;text-align:center;background:var(--green);color:#fff;border-radius:8px;padding:10px;font-size:13px;font-weight:500;text-decoration:none" onclick="hideClModal()">Ir a console.anthropic.com →</a>
+  </div>
+</div>
 
   <div class="card">
     <div class="card-title">Reglas de clasificación automática</div>
@@ -377,7 +412,7 @@ Devolvé SOLO el JSON, sin texto adicional, sin markdown, sin explicaciones.`;
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-opus-4-5',
         max_tokens: 4000,
         messages: [{
           role: 'user',
@@ -707,6 +742,14 @@ function addRule(){
   rules.push({kw,t});saveRules();document.getElementById('newKw').value='';renderRules();toast('Regla agregada','ok');
 }
 function removeRule(i){rules.splice(i,1);saveRules();renderRules();}
+
+function showClModal(){
+  const m=document.getElementById('clModal');
+  m.style.display='flex';
+  m.onclick=e=>{if(e.target===m)hideClModal();};
+}
+function hideClModal(){document.getElementById('clModal').style.display='none';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')hideClModal();});
 
 function switchTab(t){
   const names=['upload','review','push','config'];
