@@ -5,295 +5,273 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gastos Familiares · Splitwise</title>
 <style>
-:root {
-  --bg: #f7f6f3;
-  --surface: #ffffff;
-  --border: #e4e2dc;
-  --text: #1a1916;
-  --muted: #6b6860;
-  --green: #1d9e75;
-  --green-bg: #eaf7f2;
-  --red: #c0392b;
-  --red-bg: #fdf0ee;
-  --amber: #b07d2a;
-  --amber-bg: #fdf6e3;
-  --blue: #1e5fa5;
-  --blue-bg: #eaf2fd;
-  --radius: 10px;
-  --shadow: 0 1px 4px rgba(0,0,0,.07);
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #18171a;
-    --surface: #222126;
-    --border: #35333a;
-    --text: #f0eee9;
-    --muted: #9b9893;
-    --green-bg: #0d2e22;
-    --red-bg: #2e1410;
-    --amber-bg: #2a2010;
-    --blue-bg: #0d1e33;
-  }
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; }
-a { color: var(--green); text-decoration: none; }
-.app { max-width: 960px; margin: 0 auto; padding: 0 16px 60px; }
-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-.logo { font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-.logo-dot { width: 10px; height: 10px; background: var(--green); border-radius: 50%; }
-.api-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
-.dot.ok { background: var(--green); } .dot.err { background: var(--red); }
-.tabs { display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px; margin-bottom: 20px; overflow-x: auto; }
-.tab { padding: 7px 16px; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; border: none; background: none; transition: all .15s; }
-.tab.active { background: var(--green); color: #fff; }
-.tab:hover:not(.active) { color: var(--text); background: var(--bg); }
-.section { display: none; } .section.active { display: block; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; box-shadow: var(--shadow); }
-.card-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 14px; }
-.row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
-.field { flex: 1; min-width: 130px; }
-.label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
-input, select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-family: inherit; background: var(--bg); color: var(--text); outline: none; transition: border-color .15s; }
-input:focus, select:focus, textarea:focus { border-color: var(--green); }
-textarea { resize: vertical; min-height: 36px; }
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: inherit; transition: all .15s; white-space: nowrap; }
-.btn:hover { background: var(--bg); }
-.btn:active { transform: scale(.98); }
-.btn-primary { background: var(--green); color: #fff; border-color: var(--green); }
-.btn-primary:hover { background: #178a64; border-color: #178a64; }
-.btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
-.btn-danger { color: var(--red); }
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 18px; }
-.stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; text-align: center; }
-.stat-val { font-size: 24px; font-weight: 600; line-height: 1.1; }
-.stat-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-top: 3px; }
-.upload-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 28px 20px; text-align: center; cursor: pointer; transition: all .15s; }
-.upload-zone:hover, .upload-zone.over { border-color: var(--green); background: var(--green-bg); }
-.upload-icon { font-size: 30px; margin-bottom: 8px; }
-.upload-zone p { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
-.upload-zone small { color: var(--muted); font-size: 12px; }
-.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-.b-shared { background: var(--green-bg); color: var(--green); }
-.b-personal { background: var(--red-bg); color: var(--red); }
-.b-review { background: var(--amber-bg); color: var(--amber); }
-.b-sent { background: var(--blue-bg); color: var(--blue); }
-.tbl-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-th { text-align: left; padding: 9px 12px; background: var(--bg); color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid var(--border); white-space: nowrap; }
-td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: var(--bg); }
-.inline-edit { background: transparent; border: none; font-size: 12px; font-family: inherit; color: var(--text); width: 100%; padding: 2px 4px; border-radius: 4px; min-width: 120px; }
-.inline-edit:focus { outline: 1px solid var(--border); background: var(--surface); }
-.chk-s { width: 16px; height: 16px; accent-color: var(--green); cursor: pointer; }
-.src-tag { background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 2px 7px; font-size: 11px; color: var(--muted); white-space: nowrap; }
-.empty { text-align: center; padding: 40px 20px; color: var(--muted); }
-.log-box { font-family: monospace; font-size: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 12px; max-height: 220px; overflow-y: auto; line-height: 1.8; }
-.progress-wrap { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 10px 0; }
-.progress-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width .3s; }
-.cfg-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 16px; flex-wrap: wrap; }
-.cfg-row:last-child { border-bottom: none; }
-.cfg-lbl p { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
-.cfg-lbl small { font-size: 12px; color: var(--muted); }
-.rule-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); gap: 8px; }
-.rule-row:last-child { border-bottom: none; }
-.rule-kw { font-family: monospace; font-size: 12px; background: var(--bg); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border); }
-.toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 18px; font-size: 13px; box-shadow: 0 4px 20px rgba(0,0,0,.15); z-index: 9999; display: none; align-items: center; gap: 10px; max-width: 300px; }
-.toast.show { display: flex; }
-.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
-.filter-bar select { font-size: 12px; padding: 6px 8px; }
+:root{--bg:#f7f6f3;--surface:#fff;--border:#e4e2dc;--text:#1a1916;--muted:#6b6860;--green:#1d9e75;--green-bg:#eaf7f2;--red:#c0392b;--red-bg:#fdf0ee;--amber:#b07d2a;--amber-bg:#fdf6e3;--blue:#1e5fa5;--blue-bg:#eaf2fd;--radius:10px}
+@media(prefers-color-scheme:dark){:root{--bg:#18171a;--surface:#222126;--border:#35333a;--text:#f0eee9;--muted:#9b9893;--green-bg:#0d2e22;--red-bg:#2e1410;--amber-bg:#2a2010;--blue-bg:#0d1e33}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+a{color:var(--green)}
+.app{max-width:980px;margin:0 auto;padding:0 16px 60px}
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 0 20px;border-bottom:1px solid var(--border);margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.logo{font-size:17px;font-weight:600;display:flex;align-items:center;gap:8px}
+.logo-dot{width:10px;height:10px;background:var(--green);border-radius:50%}
+.api-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface);cursor:pointer}
+.dot{width:7px;height:7px;border-radius:50%;background:#ccc;flex-shrink:0}
+.dot.ok{background:var(--green)}.dot.err{background:var(--red)}
+.tabs{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:20px;overflow-x:auto}
+.tab{padding:7px 16px;border-radius:7px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;border:none;background:none;transition:all .15s}
+.tab.active{background:var(--green);color:#fff}
+.tab:hover:not(.active){color:var(--text);background:var(--bg)}
+.section{display:none}.section.active{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+.card-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.field{flex:1;min-width:130px}
+.label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;background:var(--bg);color:var(--text);outline:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--green)}
+textarea{resize:vertical;min-height:36px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:inherit;transition:all .15s;white-space:nowrap}
+.btn:hover{background:var(--bg)}.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-primary:hover{background:#178a64;border-color:#178a64}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:6px}
+.btn-danger{color:var(--red)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:18px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center}
+.stat-val{font-size:24px;font-weight:600;line-height:1.1}
+.stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:3px}
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:28px 20px;text-align:center;cursor:pointer;transition:all .15s}
+.upload-zone:hover,.upload-zone.over{border-color:var(--green);background:var(--green-bg)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.b-shared{background:var(--green-bg);color:var(--green)}
+.b-personal{background:var(--red-bg);color:var(--red)}
+.b-review{background:var(--amber-bg);color:var(--amber)}
+.b-sent{background:var(--blue-bg);color:var(--blue)}
+.tbl-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:9px 12px;background:var(--bg);color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+.inline-edit{background:transparent;border:none;font-size:12px;font-family:inherit;color:var(--text);width:100%;padding:2px 4px;border-radius:4px;min-width:120px}
+.inline-edit:focus{outline:1px solid var(--border);background:var(--surface)}
+.chk-s{width:16px;height:16px;accent-color:var(--green);cursor:pointer}
+.src-tag{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:11px;color:var(--muted);white-space:nowrap}
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.log-box{font-family:monospace;font-size:12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:12px;max-height:220px;overflow-y:auto;line-height:1.8}
+.progress-wrap{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:10px 0}
+.progress-fill{height:100%;background:var(--green);border-radius:3px;transition:width .3s}
+.cfg-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);gap:16px;flex-wrap:wrap}
+.cfg-row:last-child{border-bottom:none}
+.cfg-lbl p{font-size:13px;font-weight:500;margin-bottom:2px}
+.cfg-lbl small{font-size:12px;color:var(--muted)}
+.rule-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);gap:8px}
+.rule-row:last-child{border-bottom:none}
+.rule-kw{font-family:monospace;font-size:12px;background:var(--bg);padding:2px 8px;border-radius:4px;border:1px solid var(--border)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,.15);z-index:9999;display:none;align-items:center;gap:10px;max-width:320px}
+.toast.show{display:flex}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.filter-bar select{font-size:12px;padding:6px 8px}
+.warn-box{background:var(--amber-bg);border:1px solid var(--amber);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--amber);margin-bottom:12px;display:none}
+.info-box{background:var(--blue-bg);border:1px solid var(--blue);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--blue);margin-bottom:12px}
 </style>
 </head>
 <body>
 <div class="app">
-  <header>
-    <div class="logo"><div class="logo-dot"></div> Gastos Familiares</div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <div class="api-pill" onclick="switchTab('config')">
-        <div class="dot" id="hDot"></div><span id="hStatus">Sin API key</span>
-      </div>
-      <button class="btn btn-sm" onclick="switchTab('config')">⚙ Configurar</button>
-    </div>
-  </header>
+<header>
+  <div class="logo"><div class="logo-dot"></div> Gastos Familiares</div>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <div class="api-pill" onclick="switchTab('config')"><div class="dot" id="hDot"></div><span id="hStatus">Sin API key</span></div>
+    <button class="btn btn-sm" onclick="switchTab('config')">⚙ Configurar</button>
+  </div>
+</header>
 
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('upload')">① Cargar resumen</button>
-    <button class="tab" onclick="switchTab('review')">② Revisar gastos</button>
-    <button class="tab" onclick="switchTab('push')">③ Enviar a Splitwise</button>
-    <button class="tab" onclick="switchTab('config')">⚙ Configurar</button>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('upload')">① Cargar resumen</button>
+  <button class="tab" onclick="switchTab('review')">② Revisar gastos</button>
+  <button class="tab" onclick="switchTab('push')">③ Enviar a Splitwise</button>
+  <button class="tab" onclick="switchTab('config')">⚙ Configurar</button>
+</div>
+
+<!-- UPLOAD -->
+<div class="section active" id="sec-upload">
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="stTotal">0</div><div class="stat-lbl">Total</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--green)" id="stShared">0</div><div class="stat-lbl">Compartidos</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--red)" id="stPersonal">0</div><div class="stat-lbl">Personales</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--amber)" id="stReview">0</div><div class="stat-lbl">Revisar</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--blue)" id="stSent">0</div><div class="stat-lbl">Enviados</div></div>
   </div>
 
-  <!-- UPLOAD -->
-  <div class="section active" id="sec-upload">
-    <div class="stats">
-      <div class="stat"><div class="stat-val" id="stTotal">0</div><div class="stat-lbl">Total</div></div>
-      <div class="stat"><div class="stat-val" style="color:var(--green)" id="stShared">0</div><div class="stat-lbl">Compartidos</div></div>
-      <div class="stat"><div class="stat-val" style="color:var(--red)" id="stPersonal">0</div><div class="stat-lbl">Personales</div></div>
-      <div class="stat"><div class="stat-val" style="color:var(--amber)" id="stReview">0</div><div class="stat-lbl">Revisar</div></div>
-      <div class="stat"><div class="stat-val" style="color:var(--blue)" id="stSent">0</div><div class="stat-lbl">Enviados</div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Importar resumen</div>
-      <div class="row">
-        <div class="field"><div class="label">Fuente</div>
-          <select id="srcType">
-            <option value="visa_icbc">Visa ICBC (PDF/texto)</option>
-            <option value="amex">American Express (PDF/texto)</option>
-            <option value="mp_credito">MercadoPago crédito (CSV)</option>
-            <option value="mp_debito">MercadoPago débito (CSV)</option>
-            <option value="mastercard_mp">Mastercard MercadoPago</option>
-            <option value="manual">Manual</option>
-          </select>
-        </div>
-        <div class="field"><div class="label">¿Quién pagó?</div>
-          <select id="payerSel">
-            <option value="juan">Juan Pablo</option>
-            <option value="vicky">Victoria</option>
-          </select>
-        </div>
+  <div class="card">
+    <div class="card-title">Importar resumen</div>
+    <div class="row">
+      <div class="field"><div class="label">Fuente</div>
+        <select id="srcType">
+          <option value="visa_icbc">Visa ICBC</option>
+          <option value="amex">American Express</option>
+          <option value="mp_credito">MercadoPago crédito (CSV)</option>
+          <option value="mp_debito">MercadoPago débito (CSV)</option>
+          <option value="mastercard_mp">Mastercard MercadoPago</option>
+          <option value="manual">Manual</option>
+        </select>
       </div>
-      <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileIn').click()" ondragover="doDragOver(event)" ondragleave="doDragLeave()" ondrop="doDrop(event)">
-        <div class="upload-icon">📂</div>
-        <p>Arrastrá el archivo o hacé click</p>
-        <small>CSV de MercadoPago · Para PDFs pegá el texto abajo</small>
-        <input type="file" id="fileIn" style="display:none" accept=".csv,.xlsx,.xls" onchange="handleFile(this)">
-      </div>
-      <div id="fileStatus" style="margin-top:10px;font-size:12px;color:var(--muted)"></div>
-
-      <div style="margin-top:14px">
-        <div class="label">O pegá el texto copiado del PDF</div>
-        <textarea id="pdfText" rows="5" placeholder="Pegá aquí el texto del resumen PDF (Ctrl+A → Ctrl+C en el visor de PDF)..."></textarea>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="btn btn-primary" onclick="parsePdfText()">Procesar texto pegado</button>
-          <button class="btn" onclick="document.getElementById('pdfText').value=''">Limpiar</button>
-        </div>
+      <div class="field"><div class="label">¿Quién pagó?</div>
+        <select id="payerSel"><option value="juan">Juan Pablo</option><option value="vicky">Victoria</option></select>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title">Carga manual</div>
-      <div class="row">
-        <div class="field"><div class="label">Fecha</div><input type="date" id="m-fecha"></div>
-        <div class="field" style="flex:2"><div class="label">Descripción</div><input type="text" id="m-desc" placeholder="Ej: Super Jumbo Martínez"></div>
-        <div class="field"><div class="label">Importe</div><input type="number" id="m-imp" placeholder="0"></div>
-        <div class="field"><div class="label">Moneda</div><select id="m-mon"><option value="ARS">ARS</option><option value="USD">USD</option></select></div>
-      </div>
-      <div class="row">
-        <div class="field"><div class="label">Categoría</div>
-          <select id="m-cat">
-            <option>Supermercado</option><option>Delivery / Comida</option><option>Farmacia</option>
-            <option>Auto / Nafta</option><option>Auto / Estacionamiento</option><option>Mascotas</option>
-            <option>Streaming / Digital</option><option>Servicios / Casa</option><option>Salidas / Café</option>
-            <option>Ropa / Personal</option><option>Entretenimiento</option><option>Otro</option>
-          </select>
-        </div>
-        <div class="field" style="display:flex;align-items:flex-end">
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding-bottom:8px">
-            <input type="checkbox" id="m-shared" class="chk-s" checked> Compartido 50/50
-          </label>
-        </div>
-        <div class="field" style="display:flex;align-items:flex-end">
-          <button class="btn btn-primary" style="width:100%" onclick="addManual()">+ Agregar</button>
-        </div>
-      </div>
+    <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileIn').click()" ondragover="doDragOver(event)" ondragleave="doDragLeave()" ondrop="doDrop(event)">
+      <div style="font-size:28px;margin-bottom:8px">📂</div>
+      <p style="font-weight:500;margin-bottom:4px">Arrastrá el archivo CSV o hacé click</p>
+      <small style="color:var(--muted)">Solo CSV de MercadoPago · Para PDFs usá el campo de texto abajo</small>
+      <input type="file" id="fileIn" style="display:none" accept=".csv" onchange="handleFile(this)">
     </div>
-
-    <button class="btn btn-primary" style="width:100%" onclick="switchTab('review')">Ir a revisar gastos →</button>
+    <div id="fileStatus" style="margin-top:10px;font-size:12px;color:var(--muted)"></div>
   </div>
 
-  <!-- REVIEW -->
-  <div class="section" id="sec-review">
-    <div class="filter-bar">
-      <select id="fStatus" onchange="renderTable()">
-        <option value="all">Todos</option><option value="shared">Compartidos</option>
-        <option value="personal">Personales</option><option value="review">Revisar</option><option value="sent">Enviados</option>
-      </select>
-      <select id="fSource" onchange="renderTable()"><option value="all">Todas las fuentes</option></select>
-      <button class="btn btn-sm" onclick="bulkSet(true)">✓ Todos compartidos</button>
-      <button class="btn btn-sm" onclick="bulkSet(false)">✗ Todos personales</button>
-      <button class="btn btn-sm btn-danger" onclick="deleteSelected()" style="margin-left:auto">🗑 Eliminar selec.</button>
+  <div class="card">
+    <div class="card-title">📋 Pegar texto de PDF (Visa ICBC, Amex, etc.)</div>
+    <div class="info-box">
+      <strong>¿Cómo copiar el texto del PDF?</strong><br>
+      1. Abrí el PDF en Chrome o Adobe<br>
+      2. Ctrl+A (seleccionar todo) → Ctrl+C (copiar)<br>
+      3. Pegá abajo y hacé click en "Procesar"<br>
+      <br>
+      <strong>Importante:</strong> La app filtra automáticamente los caracteres raros del PDF. Solo extrae líneas con fecha y monto válidos.
     </div>
-    <div class="tbl-wrap">
-      <table id="expTable">
-        <thead><tr>
-          <th><input type="checkbox" id="chkAll" onchange="toggleAll(this)" style="width:14px;height:14px"></th>
-          <th>Fecha</th><th>Descripción Splitwise</th><th>Comercio original</th>
-          <th>Importe</th><th>Compartido</th><th>Categoría</th><th>Estado</th><th>Fuente</th>
-        </tr></thead>
-        <tbody id="expBody"></tbody>
-      </table>
+    <textarea id="pdfText" rows="6" placeholder="Pegá aquí el texto completo del PDF...&#10;&#10;Ejemplo de lo que reconoce:&#10;02/05/26 RAPPI   000723K   14662,00&#10;11/05/26 NETFLIX.COM   793556P   25398,00&#10;18/05/26 JUMBO MARTINEZ   169700K   171976,51"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="parsePdfText()">▶ Procesar texto</button>
+      <button class="btn" onclick="document.getElementById('pdfText').value=''">✕ Limpiar</button>
     </div>
-    <div id="emptyMsg" class="empty" style="display:none">No hay gastos. Cargá un resumen en el paso 1.</div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap">
-      <button class="btn" onclick="exportCSV()">⬇ Exportar CSV</button>
-      <button class="btn btn-primary" onclick="switchTab('push')">Enviar a Splitwise →</button>
-    </div>
+    <div id="parseResult" style="margin-top:8px;font-size:12px;color:var(--muted)"></div>
   </div>
 
-  <!-- PUSH -->
-  <div class="section" id="sec-push">
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-        <div class="card-title" style="margin-bottom:0">Envío a Splitwise</div>
-        <div class="api-pill"><div class="dot" id="pDot"></div><span id="pStatus">Sin API key</span></div>
-      </div>
-      <div id="pushPreview"></div>
-      <div class="progress-wrap"><div class="progress-fill" id="pushBar" style="width:0%"></div></div>
-      <p style="font-size:12px;color:var(--muted)" id="pushTxt"></p>
-      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-        <button class="btn btn-primary" onclick="pushAll()" id="btnPush" disabled>🚀 Enviar todos los compartidos</button>
-        <button class="btn" onclick="testConn()">↺ Probar conexión</button>
-      </div>
+  <div class="card">
+    <div class="card-title">Carga manual</div>
+    <div class="row">
+      <div class="field"><div class="label">Fecha</div><input type="date" id="m-fecha"></div>
+      <div class="field" style="flex:2"><div class="label">Descripción</div><input type="text" id="m-desc" placeholder="Ej: Super Jumbo Martínez"></div>
+      <div class="field"><div class="label">Importe</div><input type="number" id="m-imp" placeholder="0" step="0.01"></div>
+      <div class="field"><div class="label">Moneda</div><select id="m-mon"><option value="ARS">ARS</option><option value="USD">USD</option></select></div>
     </div>
-    <div class="card" id="logCard" style="display:none">
-      <div class="card-title">Log de envío</div>
-      <div class="log-box" id="logBox"></div>
-    </div>
-  </div>
-
-  <!-- CONFIG -->
-  <div class="section" id="sec-config">
-    <div class="card">
-      <div class="card-title">Conexión Splitwise</div>
-      <div class="cfg-row">
-        <div class="cfg-lbl"><p>API Key</p><small>Obtené tu key en <a href="https://www.splitwise.com/apps" target="_blank">splitwise.com/apps</a></small></div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <input type="password" id="apiIn" placeholder="tu-api-key-aquí" style="width:240px;font-size:12px">
-          <button class="btn btn-sm btn-primary" onclick="saveKey()">Guardar</button>
-        </div>
+    <div class="row">
+      <div class="field"><div class="label">Categoría</div>
+        <select id="m-cat">
+          <option>Supermercado</option><option>Delivery / Comida</option><option>Farmacia</option>
+          <option>Auto / Nafta</option><option>Auto / Estacionamiento</option><option>Mascotas</option>
+          <option>Streaming / Digital</option><option>Servicios / Casa</option><option>Salidas / Café</option>
+          <option>Ropa / Personal</option><option>Entretenimiento</option><option>Otro</option>
+        </select>
       </div>
-      <div class="cfg-row">
-        <div class="cfg-lbl"><p>Grupo por defecto</p><small>Los gastos compartidos irán a este grupo</small></div>
-        <div style="display:flex;gap:6px;align-items:center">
-          <select id="groupSel" style="width:240px;font-size:12px"><option value="">— cargar grupos —</option></select>
-          <button class="btn btn-sm" onclick="loadGroups()">↺</button>
-        </div>
-      </div>
-      <div class="cfg-row">
-        <div class="cfg-lbl"><p>División</p></div>
-        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
-          <input type="checkbox" checked id="cfgEqual" class="chk-s"> 50% / 50% Juan Pablo y Victoria
+      <div class="field" style="display:flex;align-items:flex-end">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;padding-bottom:8px">
+          <input type="checkbox" id="m-shared" class="chk-s" checked> Compartido 50/50
         </label>
       </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Reglas de clasificación automática</div>
-      <div id="rulesList"></div>
-      <div style="display:flex;gap:6px;margin-top:14px;flex-wrap:wrap">
-        <input type="text" id="newKw" placeholder="Palabra clave (ej: JUMBO)" style="flex:1;min-width:120px;font-size:12px">
-        <select id="newType" style="font-size:12px">
-          <option value="shared">Compartido</option>
-          <option value="personal">Personal</option>
-          <option value="review">Revisar</option>
-        </select>
-        <button class="btn btn-sm btn-primary" onclick="addRule()">+ Agregar regla</button>
+      <div class="field" style="display:flex;align-items:flex-end">
+        <button class="btn btn-primary" style="width:100%" onclick="addManual()">+ Agregar</button>
       </div>
     </div>
   </div>
+
+  <button class="btn btn-primary" style="width:100%" onclick="switchTab('review')">Ver gastos cargados →</button>
+</div>
+
+<!-- REVIEW -->
+<div class="section" id="sec-review">
+  <div id="warnBox" class="warn-box"></div>
+  <div class="filter-bar">
+    <select id="fStatus" onchange="renderTable()">
+      <option value="all">Todos los estados</option>
+      <option value="shared">Compartidos</option>
+      <option value="personal">Personales</option>
+      <option value="review">A revisar</option>
+      <option value="sent">Enviados</option>
+    </select>
+    <select id="fSource" onchange="renderTable()"><option value="all">Todas las fuentes</option></select>
+    <button class="btn btn-sm" onclick="bulkSet(true)">✓ Todos compartidos</button>
+    <button class="btn btn-sm" onclick="bulkSet(false)">✗ Todos personales</button>
+    <button class="btn btn-sm btn-danger" onclick="deleteSelected()" style="margin-left:auto">🗑 Eliminar selec.</button>
+  </div>
+  <div class="tbl-wrap">
+    <table id="expTable">
+      <thead><tr>
+        <th><input type="checkbox" id="chkAll" onchange="toggleAll(this)" style="width:14px;height:14px"></th>
+        <th>Fecha</th><th>Descripción Splitwise</th><th>Original</th>
+        <th>Importe</th><th>Compartido</th><th>Categoría</th><th>Estado</th><th>Fuente</th>
+      </tr></thead>
+      <tbody id="expBody"></tbody>
+    </table>
+  </div>
+  <div id="emptyMsg" class="empty" style="display:none">No hay gastos. Cargá un resumen en el paso 1.</div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap">
+    <button class="btn" onclick="exportCSV()">⬇ Exportar CSV</button>
+    <button class="btn btn-primary" onclick="switchTab('push')">Enviar a Splitwise →</button>
+  </div>
+</div>
+
+<!-- PUSH -->
+<div class="section" id="sec-push">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin-bottom:0">Envío a Splitwise</div>
+      <div class="api-pill"><div class="dot" id="pDot"></div><span id="pStatus">Sin API key</span></div>
+    </div>
+    <div id="pushPreview"></div>
+    <div class="progress-wrap"><div class="progress-fill" id="pushBar" style="width:0%"></div></div>
+    <p style="font-size:12px;color:var(--muted)" id="pushTxt"></p>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="pushAll()" id="btnPush" disabled>🚀 Enviar todos los compartidos</button>
+      <button class="btn" onclick="testConn()">↺ Probar conexión</button>
+    </div>
+  </div>
+  <div class="card" id="logCard" style="display:none">
+    <div class="card-title">Log de envío</div>
+    <div class="log-box" id="logBox"></div>
+  </div>
+</div>
+
+<!-- CONFIG -->
+<div class="section" id="sec-config">
+  <div class="card">
+    <div class="card-title">Conexión Splitwise</div>
+    <div class="cfg-row">
+      <div class="cfg-lbl"><p>API Key</p><small>Obtené tu key en <a href="https://www.splitwise.com/apps" target="_blank">splitwise.com/apps</a></small></div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="password" id="apiIn" placeholder="tu-api-key-aquí" style="width:240px;font-size:12px">
+        <button class="btn btn-sm btn-primary" onclick="saveKey()">Guardar</button>
+      </div>
+    </div>
+    <div class="cfg-row">
+      <div class="cfg-lbl"><p>Grupo por defecto</p><small>Los gastos compartidos irán a este grupo</small></div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <select id="groupSel" style="width:240px;font-size:12px"><option value="">— cargar grupos —</option></select>
+        <button class="btn btn-sm" onclick="loadGroups()">↺ Cargar</button>
+      </div>
+    </div>
+    <div class="cfg-row">
+      <div class="cfg-lbl"><p>División</p></div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+        <input type="checkbox" checked id="cfgEqual" class="chk-s"> 50% / 50% Juan Pablo y Victoria
+      </label>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Reglas de clasificación automática</div>
+    <div id="rulesList"></div>
+    <div style="display:flex;gap:6px;margin-top:14px;flex-wrap:wrap">
+      <input type="text" id="newKw" placeholder="Palabra clave (ej: WALMART)" style="flex:1;min-width:120px;font-size:12px">
+      <select id="newType" style="font-size:12px">
+        <option value="shared">Compartido</option>
+        <option value="personal">Personal</option>
+        <option value="review">Revisar</option>
+      </select>
+      <button class="btn btn-sm btn-primary" onclick="addRule()">+ Agregar regla</button>
+    </div>
+  </div>
+</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -313,9 +291,11 @@ let rules = JSON.parse(localStorage.getItem('sw_rules') || 'null') || [
   {kw:'PARKING',t:'shared'},{kw:'PEAJE',t:'shared'},{kw:'BLOSOM',t:'shared'},
   {kw:'SHOWCASE',t:'shared'},{kw:'FRIGCAPARRO',t:'shared'},{kw:'MULTICANNING',t:'shared'},
   {kw:'MI FARMA',t:'shared'},{kw:'MAQUERA',t:'shared'},{kw:'LANZAVECCHIA',t:'shared'},
+  {kw:'STARBUCKS',t:'shared'},{kw:'MCDONALDS',t:'shared'},{kw:'MC DONALDS',t:'shared'},
+  {kw:'UBER',t:'shared'},{kw:'CABIFY',t:'shared'},{kw:'TOYOTA',t:'shared'},
   {kw:'STEAM',t:'personal'},{kw:'ADOBE',t:'personal'},{kw:'ADIDAS',t:'personal'},
   {kw:'G-SHOCK',t:'personal'},{kw:'ZARA',t:'personal'},{kw:'TIDAL',t:'personal'},
-  {kw:'ALLPAGO',t:'personal'},{kw:'WYNDHAM',t:'personal'},
+  {kw:'ALLPAGO',t:'personal'},{kw:'WYNDHAM',t:'personal'},{kw:'OPENAI',t:'personal'},
   {kw:'PSA',t:'review'},{kw:'ZURICH',t:'review'},{kw:'SEGURO',t:'review'},
 ];
 
@@ -328,42 +308,117 @@ function classify(desc){
 }
 
 function cleanDesc(raw){
-  return (raw||'').replace(/MERPAGO\*/i,'').replace(/PROPINA\*/i,'Propina ')
-    .replace(/DLO\*/i,'').replace(/PAYU\*AR\*/i,'').replace(/DSA-FCIA /i,'')
-    .replace(/MERPAGO/i,'').replace(/C\.\d+\/\d+/g,'').replace(/\s{2,}/g,' ').trim();
+  return (raw||'')
+    .replace(/MERPAGO\*/gi,'')
+    .replace(/PROPINA\*/gi,'Propina ')
+    .replace(/DLO\*/gi,'')
+    .replace(/PAYU\*AR\*/gi,'')
+    .replace(/DSA-FCIA /gi,'')
+    .replace(/MERPAGO/gi,'')
+    .replace(/C\.\d+\/\d+/g,'')
+    .replace(/\b\d{6,}\*?\b/g,'')
+    .replace(/\bMT1F\b/g,'')
+    .replace(/\bUSD\b/g,'')
+    .replace(/\s{2,}/g,' ')
+    .trim();
 }
 
-function addExpense(e){ expenses.push(e); updateStats(); }
+// ── PDF text parser ──────────────────────────────────────────────────────────
+function parsePdfText(){
+  const raw = document.getElementById('pdfText').value;
+  if(!raw.trim()){ toast('Pegá el texto primero','warn'); return; }
 
-function updateStats(){
-  document.getElementById('stTotal').textContent = expenses.length;
-  document.getElementById('stShared').textContent = expenses.filter(e=>e.status==='shared').length;
-  document.getElementById('stPersonal').textContent = expenses.filter(e=>e.status==='personal').length;
-  document.getElementById('stReview').textContent = expenses.filter(e=>e.status==='review').length;
-  document.getElementById('stSent').textContent = expenses.filter(e=>e.sent).length;
-}
+  const payer = document.getElementById('payerSel').value;
+  const src   = document.getElementById('srcType').value;
+  const lines = raw.split('\n');
+  let added = 0, skipped = 0;
 
-function addManual(){
-  const desc = document.getElementById('m-desc').value.trim();
-  const imp = parseFloat(document.getElementById('m-imp').value)||0;
-  if(!desc||!imp){ toast('Completá descripción e importe','warn'); return; }
-  addExpense({
-    id: Date.now(), fecha: document.getElementById('m-fecha').value || new Date().toISOString().slice(0,10),
-    desc, original: desc, importe: imp, moneda: document.getElementById('m-mon').value,
-    status: document.getElementById('m-shared').checked ? 'shared' : 'personal',
-    categoria: document.getElementById('m-cat').value, source: 'Manual', sent: false
+  // Regex para fecha Argentina/resumenes bancarios: DD/MM/YY o DD/MM/YYYY
+  const dateRe  = /\b(\d{2}\/\d{2}\/\d{2,4})\b/;
+  // Importe: número con puntos de miles y coma decimal, ej: 1.234.567,89 o 14662,00
+  const impRe   = /\b(\d{1,3}(?:\.\d{3})*,\d{2})\b(?![\d])/g;
+  // Filtro de líneas basura: si >40% de los chars son no-ASCII, descartamos
+  const garbageRe = /[^\x00-\x7F]/g;
+
+  lines.forEach(line => {
+    // Limpiar la línea de caracteres no-ASCII
+    const cleaned = line.replace(garbageRe, ' ').replace(/\s{2,}/g,' ').trim();
+    if(cleaned.length < 6) return;
+
+    // Filtrar líneas con >30% chars raros en el original
+    const nonAscii = (line.match(/[^\x00-\x7F]/g)||[]).length;
+    if(nonAscii / line.length > 0.3){ skipped++; return; }
+
+    // Necesitamos fecha
+    const dm = cleaned.match(dateRe);
+    if(!dm) return;
+
+    // Detectar si es USD
+    const isUSD = /\bUSD\b/i.test(cleaned);
+
+    // Extraer todos los importes de la línea, tomar el mayor (suele ser el monto)
+    let bestImp = 0;
+    let m;
+    impRe.lastIndex = 0;
+    while((m = impRe.exec(cleaned)) !== null){
+      const v = parseFloat(m[1].replace(/\./g,'').replace(',','.'));
+      if(v > bestImp) bestImp = v;
+    }
+    if(!bestImp || bestImp <= 0) return;
+
+    // Ignorar si es pago/saldo/ajuste/devolución
+    const upperLine = cleaned.toUpperCase();
+    if(/SALDO ANTERIOR|SU PAGO|PAGO EN|INTERESES|DB IVA|IIBB|IVA RG|DB\.RG|DEV\.IMP|PERCEP|FINANCIACION/.test(upperLine)) return;
+    // Ignorar importes negativos (devoluciones) — líneas con "-" al final del monto
+    if(/\d,\d{2}-/.test(cleaned)) return;
+
+    // Extraer descripción: todo entre la fecha y el primer número grande
+    let desc = cleaned
+      .replace(dm[0],'')                    // quitar fecha
+      .replace(/\b[A-Z0-9]{6,}\*?\b/g,' ')  // quitar comprobantes (6+ chars alfanum)
+      .replace(/\b\d{1,3}(?:\.\d{3})*,\d{2}\b/g,' ') // quitar montos
+      .replace(/\bC\.\d+\/\d+\b/g,'')       // quitar cuotas "C.02/03"
+      .replace(/\bMT1F\b/gi,'')
+      .replace(/\bUSD\b/gi,'')
+      .replace(/[-–]\s*$/, '')
+      .replace(/\s{2,}/g,' ')
+      .trim();
+
+    if(!desc || desc.length < 2) return;
+
+    // Normalizar fecha a YYYY-MM-DD
+    const parts = dm[1].split('/');
+    let year = parts[2]; if(year.length===2) year='20'+year;
+    const fecha = `${year}-${parts[1]}-${parts[0]}`;
+
+    addExpense({
+      id: Date.now() + Math.random(),
+      fecha, desc: cleanDesc(desc), original: desc,
+      importe: bestImp, moneda: isUSD ? 'USD' : 'ARS',
+      status: classify(desc), categoria: 'Otro',
+      source: src, payer, sent: false
+    });
+    added++;
   });
-  document.getElementById('m-desc').value = '';
-  document.getElementById('m-imp').value = '';
-  toast('Gasto agregado','ok');
+
+  const msg = `✓ ${added} gastos extraídos${skipped?' · '+skipped+' líneas descartadas (texto ilegible)':''}`;
+  document.getElementById('parseResult').textContent = msg;
+  if(added > 0){
+    toast(added + ' gastos importados','ok');
+  } else {
+    toast('No se encontraron movimientos válidos. Probá con el selector de cuota debajo.','warn');
+    document.getElementById('parseResult').innerHTML =
+      '<span style="color:var(--red)">No se encontraron líneas con fecha + importe. Revisá que el texto tenga el formato correcto o cargalos manualmente.</span>';
+  }
 }
 
+// ── CSV ──────────────────────────────────────────────────────────────────────
 function handleFile(inp){
   const f = inp.files[0]; if(!f) return;
-  document.getElementById('fileStatus').textContent = 'Procesando: ' + f.name + '...';
+  document.getElementById('fileStatus').textContent = 'Procesando: '+f.name+'...';
   const reader = new FileReader();
   reader.onload = e => parseCSV(e.target.result, f.name);
-  reader.readAsText(f, 'UTF-8');
+  reader.readAsText(f,'UTF-8');
 }
 
 function parseCSV(text, fname){
@@ -380,45 +435,16 @@ function parseCSV(text, fname){
     const desc = c[1]||c[2]||'';
     const impStr = (c[3]||c[2]||'').replace(/\./g,'').replace(',','.');
     const imp = parseFloat(impStr)||0;
-    if(!imp || imp < 0) return;
+    if(!imp||imp<0) return;
     addExpense({
       id: Date.now()+i, fecha, desc: cleanDesc(desc), original: desc,
-      importe: imp, moneda: 'ARS', status: classify(desc),
-      categoria: 'Otro', source: src + ' · ' + fname, payer, sent: false
+      importe: imp, moneda:'ARS', status: classify(desc),
+      categoria:'Otro', source: src+' · '+fname, payer, sent:false
     });
     added++;
   });
-  document.getElementById('fileStatus').textContent = '✓ ' + added + ' movimientos importados de ' + fname;
-  toast(added + ' gastos importados','ok');
-}
-
-function parsePdfText(){
-  const raw = document.getElementById('pdfText').value.trim();
-  if(!raw){ toast('Pegá el texto primero','warn'); return; }
-  const payer = document.getElementById('payerSel').value;
-  const src = document.getElementById('srcType').value;
-  const lines = raw.split('\n').filter(l=>l.trim());
-  let added = 0;
-  const dateRe = /(\d{2}\/\d{2}\/\d{2,4})/;
-  const impRe = /[\$\s]([\d\.]+,\d{2})(?:\s|$)/;
-  lines.forEach(line=>{
-    const dm = line.match(dateRe);
-    const im = line.match(impRe);
-    if(!dm||!im) return;
-    const imp = parseFloat(im[1].replace(/\./g,'').replace(',','.'))||0;
-    if(!imp||imp<0) return;
-    const descRaw = line.replace(dateRe,'').replace(im[0],'').replace(/C\.\d+\/\d+/g,'')
-      .replace(/\d{6,}\*?/g,'').replace(/USD\s+[\d,\.]+/g,'').replace(/MT1F/g,'').trim();
-    if(!descRaw||descRaw.length<3) return;
-    addExpense({
-      id: Date.now()+Math.random(), fecha: dm[1], desc: cleanDesc(descRaw),
-      original: descRaw, importe: imp, moneda: 'ARS',
-      status: classify(descRaw), categoria: 'Otro', source: src, payer, sent: false
-    });
-    added++;
-  });
-  if(added) toast(added + ' gastos extraídos del texto','ok');
-  else toast('No se encontraron movimientos. Revisá el formato.','warn');
+  document.getElementById('fileStatus').textContent = '✓ '+added+' movimientos de '+fname;
+  toast(added+' gastos importados','ok');
 }
 
 function doDragOver(e){ e.preventDefault(); document.getElementById('dropZone').classList.add('over'); }
@@ -426,44 +452,76 @@ function doDragLeave(){ document.getElementById('dropZone').classList.remove('ov
 function doDrop(e){
   e.preventDefault(); doDragLeave();
   const f = e.dataTransfer.files[0];
-  if(f){ document.getElementById('fileIn').files = e.dataTransfer.files; handleFile(document.getElementById('fileIn')); }
+  if(f){ document.getElementById('fileIn').files=e.dataTransfer.files; handleFile(document.getElementById('fileIn')); }
 }
 
+// ── Manual ───────────────────────────────────────────────────────────────────
+function addManual(){
+  const desc = document.getElementById('m-desc').value.trim();
+  const imp  = parseFloat(document.getElementById('m-imp').value)||0;
+  if(!desc||!imp){ toast('Completá descripción e importe','warn'); return; }
+  addExpense({
+    id:Date.now(), fecha:document.getElementById('m-fecha').value||new Date().toISOString().slice(0,10),
+    desc, original:desc, importe:imp, moneda:document.getElementById('m-mon').value,
+    status:document.getElementById('m-shared').checked?'shared':'personal',
+    categoria:document.getElementById('m-cat').value, source:'Manual', payer:'juan', sent:false
+  });
+  document.getElementById('m-desc').value='';
+  document.getElementById('m-imp').value='';
+  toast('Gasto agregado','ok');
+}
+
+function addExpense(e){ expenses.push(e); updateStats(); }
+
+function updateStats(){
+  document.getElementById('stTotal').textContent    = expenses.length;
+  document.getElementById('stShared').textContent   = expenses.filter(e=>e.status==='shared').length;
+  document.getElementById('stPersonal').textContent = expenses.filter(e=>e.status==='personal').length;
+  document.getElementById('stReview').textContent   = expenses.filter(e=>e.status==='review').length;
+  document.getElementById('stSent').textContent     = expenses.filter(e=>e.sent).length;
+}
+
+// ── Table ────────────────────────────────────────────────────────────────────
 function renderTable(){
-  const sf = document.getElementById('fStatus').value;
-  const ss = document.getElementById('fSource').value;
-  let rows = expenses;
-  if(sf !== 'all') rows = rows.filter(e => sf==='sent' ? e.sent : e.status===sf);
-  if(ss !== 'all') rows = rows.filter(e => e.source===ss);
+  const sf  = document.getElementById('fStatus').value;
+  const ss  = document.getElementById('fSource').value;
+  let rows  = expenses;
+  if(sf!=='all') rows = rows.filter(e=>sf==='sent'?e.sent:e.status===sf);
+  if(ss!=='all') rows = rows.filter(e=>e.source===ss);
 
   const srcs = [...new Set(expenses.map(e=>e.source))];
   const fsel = document.getElementById('fSource');
-  const cur = fsel.value;
+  const cur  = fsel.value;
   fsel.innerHTML = '<option value="all">Todas las fuentes</option>';
-  srcs.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s.slice(0,30); if(s===cur)o.selected=true; fsel.appendChild(o); });
+  srcs.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s.slice(0,35); if(s===cur)o.selected=true; fsel.appendChild(o); });
+
+  const reviewCount = expenses.filter(e=>e.status==='review'&&!e.sent).length;
+  const wb = document.getElementById('warnBox');
+  if(reviewCount>0){ wb.style.display='block'; wb.textContent='⚠ '+reviewCount+' gastos marcados como "Revisar" — revisalos antes de enviar a Splitwise.'; }
+  else { wb.style.display='none'; }
 
   const tbody = document.getElementById('expBody');
-  tbody.innerHTML = '';
-  document.getElementById('emptyMsg').style.display = rows.length ? 'none' : 'block';
-  document.getElementById('expTable').style.display = rows.length ? '' : 'none';
+  tbody.innerHTML='';
+  document.getElementById('emptyMsg').style.display = rows.length?'none':'block';
+  document.getElementById('expTable').style.display = rows.length?'':'none';
 
   rows.forEach(e=>{
     const tr = document.createElement('tr');
-    const badge = e.sent ? '<span class="badge b-sent">Enviado</span>' :
-      e.status==='shared' ? '<span class="badge b-shared">Compartido</span>' :
-      e.status==='personal' ? '<span class="badge b-personal">Personal</span>' :
+    const badge = e.sent?'<span class="badge b-sent">Enviado</span>':
+      e.status==='shared'?'<span class="badge b-shared">Compartido</span>':
+      e.status==='personal'?'<span class="badge b-personal">Personal</span>':
       '<span class="badge b-review">Revisar</span>';
     const fd = e.fecha ? e.fecha.slice(5).split('-').reverse().join('/') : '';
-    tr.innerHTML = `
+    tr.innerHTML=`
       <td><input type="checkbox" class="rchk chk-s" data-id="${e.id}"></td>
       <td style="white-space:nowrap">${esc(fd)}</td>
       <td><input class="inline-edit" value="${esc(e.desc)}" onchange="upd(${e.id},'desc',this.value)"></td>
-      <td style="color:var(--muted);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(e.original)}">${esc(e.original.slice(0,28))}${e.original.length>28?'…':''}</td>
+      <td style="color:var(--muted);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(e.original)}">${esc(e.original.slice(0,30))}${e.original.length>30?'…':''}</td>
       <td style="white-space:nowrap;font-weight:600">${e.moneda==='USD'?'U$S ':'$'}${e.importe.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
       <td style="text-align:center"><input type="checkbox" class="chk-s" ${e.status==='shared'?'checked':''} onchange="setShared(${e.id},this.checked)" ${e.sent?'disabled':''}></td>
       <td style="font-size:11px;color:var(--muted)">${esc(e.categoria||'')}</td>
       <td>${badge}</td>
-      <td><span class="src-tag">${esc((e.source||'').slice(0,20))}</span></td>`;
+      <td><span class="src-tag">${esc((e.source||'').slice(0,22))}</span></td>`;
     tbody.appendChild(tr);
   });
 }
@@ -474,40 +532,31 @@ function upd(id,f,v){ const e=expenses.find(x=>x.id===id); if(e) e[f]=v; }
 function toggleAll(c){ document.querySelectorAll('.rchk').forEach(x=>x.checked=c.checked); }
 function bulkSet(shared){ expenses.forEach(e=>{if(!e.sent)e.status=shared?'shared':'personal';}); updateStats();renderTable(); }
 function deleteSelected(){
-  const ids = new Set([...document.querySelectorAll('.rchk:checked')].map(c=>parseInt(c.dataset.id)));
+  const ids=new Set([...document.querySelectorAll('.rchk:checked')].map(c=>parseInt(c.dataset.id)));
   if(!ids.size){toast('Seleccioná gastos primero','warn');return;}
-  expenses = expenses.filter(e=>!ids.has(e.id));
-  updateStats(); renderTable();
+  expenses=expenses.filter(e=>!ids.has(e.id));
+  updateStats();renderTable();
   toast(ids.size+' gastos eliminados','ok');
 }
 
-function switchTab(t){
-  const names=['upload','review','push','config'];
-  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',names[i]===t));
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById('sec-'+t).classList.add('active');
-  if(t==='review') renderTable();
-  if(t==='push') renderPush();
-  if(t==='config') renderRules();
-}
-
+// ── Push ─────────────────────────────────────────────────────────────────────
 function renderPush(){
   const toSend = expenses.filter(e=>e.status==='shared'&&!e.sent);
   const ok = !!apiKey;
-  document.getElementById('pDot').className = 'dot ' + (ok?'ok':'err');
-  document.getElementById('pStatus').textContent = ok ? 'API conectada' : 'Sin API key';
-  document.getElementById('btnPush').disabled = !ok || !toSend.length;
-  const arsTotal = toSend.filter(e=>e.moneda==='ARS').reduce((s,e)=>s+e.importe,0);
-  const usdTotal = toSend.filter(e=>e.moneda==='USD').reduce((s,e)=>s+e.importe,0);
-  const grpName = selectedGroup ? (groups.find(g=>String(g.id)===selectedGroup)||{name:'Grupo seleccionado'}).name : 'Sin grupo';
-  document.getElementById('pushPreview').innerHTML = toSend.length ?
+  document.getElementById('pDot').className='dot '+(ok?'ok':'err');
+  document.getElementById('pStatus').textContent=ok?'API conectada':'Sin API key';
+  document.getElementById('btnPush').disabled=!ok||!toSend.length;
+  const arsTotal=toSend.filter(e=>e.moneda==='ARS').reduce((s,e)=>s+e.importe,0);
+  const usdTotal=toSend.filter(e=>e.moneda==='USD').reduce((s,e)=>s+e.importe,0);
+  const grpName=selectedGroup?(groups.find(g=>String(g.id)===selectedGroup)||{name:'Grupo seleccionado'}).name:'Sin grupo';
+  document.getElementById('pushPreview').innerHTML=toSend.length?
     `<div class="stats" style="margin-bottom:12px">
       <div class="stat"><div class="stat-val">${toSend.length}</div><div class="stat-lbl">A enviar</div></div>
       <div class="stat"><div class="stat-val" style="font-size:16px">$${arsTotal.toLocaleString('es-AR',{maximumFractionDigits:0})}</div><div class="stat-lbl">Total ARS</div></div>
-      ${usdTotal?`<div class="stat"><div class="stat-val" style="font-size:16px">U$S ${usdTotal.toFixed(2)}</div><div class="stat-lbl">Total USD</div></div>`:''}
+      ${usdTotal?`<div class="stat"><div class="stat-val" style="font-size:16px">U$S ${usdTotal.toFixed(2)}</div><div class="stat-lbl">USD</div></div>`:''}
       <div class="stat"><div class="stat-val" style="font-size:14px">${esc(grpName)}</div><div class="stat-lbl">Grupo</div></div>
     </div>
-    <p style="font-size:12px;color:var(--muted)">Cada gasto se crea al 50% entre Juan Pablo y Victoria.${!ok?' <strong style="color:var(--red)">Configurá la API key primero.</strong>':''}</p>` :
+    <p style="font-size:12px;color:var(--muted)">Cada gasto se crea al 50/50. ${!ok?'<strong style="color:var(--red)">Configurá la API key primero.</strong>':''}</p>`:
     '<p style="color:var(--muted);font-size:13px">No hay gastos compartidos pendientes.</p>';
 }
 
@@ -515,94 +564,87 @@ async function testConn(){
   if(!apiKey){toast('Configurá la API key primero','warn');return;}
   toast('Conectando…','info');
   try{
-    const r = await fetch('https://secure.splitwise.com/api/v3.0/get_current_user',{headers:{Authorization:'Bearer '+apiKey}});
+    const r=await fetch('https://secure.splitwise.com/api/v3.0/get_current_user',{headers:{Authorization:'Bearer '+apiKey}});
     if(r.ok){const d=await r.json();toast('Conectado: '+d.user.first_name+' '+d.user.last_name,'ok');}
     else toast('Error '+r.status+': verificá la API key','err');
-  }catch(e){ toast('Error de conexión: '+e.message,'err'); }
+  }catch(e){toast('Error: '+e.message,'err');}
 }
 
 async function loadGroups(){
   if(!apiKey){toast('Configurá la API key primero','warn');return;}
   try{
-    const r = await fetch('https://secure.splitwise.com/api/v3.0/get_groups',{headers:{Authorization:'Bearer '+apiKey}});
+    const r=await fetch('https://secure.splitwise.com/api/v3.0/get_groups',{headers:{Authorization:'Bearer '+apiKey}});
     if(r.ok){
-      const d = await r.json(); groups = d.groups||[];
-      const sel = document.getElementById('groupSel');
-      sel.innerHTML = '<option value="">— elegí un grupo —</option>';
-      groups.forEach(g=>{ const o=document.createElement('option'); o.value=g.id; o.textContent=g.name; if(String(g.id)===selectedGroup)o.selected=true; sel.appendChild(o); });
-      sel.onchange = ()=>{ selectedGroup=sel.value; localStorage.setItem('sw_group',sel.value); };
+      const d=await r.json(); groups=d.groups||[];
+      const sel=document.getElementById('groupSel');
+      sel.innerHTML='<option value="">— elegí un grupo —</option>';
+      groups.forEach(g=>{const o=document.createElement('option');o.value=g.id;o.textContent=g.name;if(String(g.id)===selectedGroup)o.selected=true;sel.appendChild(o);});
+      sel.onchange=()=>{selectedGroup=sel.value;localStorage.setItem('sw_group',sel.value);};
       toast(groups.length+' grupos cargados','ok');
     }
-  }catch(e){ toast('No se pudieron cargar grupos','err'); }
+  }catch(e){toast('Error: '+e.message,'err');}
 }
 
 async function pushAll(){
-  const toSend = expenses.filter(e=>e.status==='shared'&&!e.sent);
+  const toSend=expenses.filter(e=>e.status==='shared'&&!e.sent);
   if(!toSend.length){toast('Nada para enviar','warn');return;}
   if(!apiKey){toast('Configurá la API key','warn');return;}
   if(!selectedGroup){toast('Seleccioná un grupo en ⚙ Configurar','warn');return;}
   document.getElementById('logCard').style.display='block';
-  const log = document.getElementById('logBox'); log.innerHTML='';
+  const log=document.getElementById('logBox'); log.innerHTML='';
   document.getElementById('btnPush').disabled=true;
   let ok=0,fail=0;
   for(let i=0;i<toSend.length;i++){
-    const e = toSend[i];
-    document.getElementById('pushBar').style.width = Math.round(((i+1)/toSend.length)*100)+'%';
-    document.getElementById('pushTxt').textContent = `Enviando ${i+1}/${toSend.length}: ${e.desc}`;
-    const grp = groups.find(g=>String(g.id)===selectedGroup);
-    const members = grp ? grp.members : [];
-    const half = (e.importe/2).toFixed(2);
-    const body = {
-      cost: e.importe.toFixed(2), description: e.desc,
-      date: (e.fecha||new Date().toISOString().slice(0,10))+'T12:00:00Z',
-      currency_code: e.moneda, group_id: parseInt(selectedGroup)
-    };
+    const e=toSend[i];
+    document.getElementById('pushBar').style.width=Math.round(((i+1)/toSend.length)*100)+'%';
+    document.getElementById('pushTxt').textContent=`Enviando ${i+1}/${toSend.length}: ${e.desc}`;
+    const grp=groups.find(g=>String(g.id)===selectedGroup);
+    const members=grp?grp.members:[];
+    const half=(e.importe/2).toFixed(2);
+    const body={cost:e.importe.toFixed(2),description:e.desc,date:(e.fecha||new Date().toISOString().slice(0,10))+'T12:00:00Z',currency_code:e.moneda,group_id:parseInt(selectedGroup)};
     if(members.length>=2){
-      body['users__0__user_id']=members[0].id; body['users__0__paid_amount']=e.importe.toFixed(2); body['users__0__owed_amount']=half;
-      body['users__1__user_id']=members[1].id; body['users__1__paid_amount']='0.00'; body['users__1__owed_amount']=half;
+      body['users__0__user_id']=members[0].id;body['users__0__paid_amount']=e.importe.toFixed(2);body['users__0__owed_amount']=half;
+      body['users__1__user_id']=members[1].id;body['users__1__paid_amount']='0.00';body['users__1__owed_amount']=half;
     } else { body.split_equally=true; }
     try{
-      const r = await fetch('https://secure.splitwise.com/api/v3.0/create_expense',{
-        method:'POST', headers:{Authorization:'Bearer '+apiKey,'Content-Type':'application/json'}, body:JSON.stringify(body)
-      });
-      const d = await r.json();
-      if(r.ok&&d.expenses&&d.expenses.length){ e.sent=true; ok++; log.innerHTML+=`<span style="color:var(--green)">✓ ${esc(e.desc)} — $${e.importe.toLocaleString('es-AR')}</span>\n`; }
-      else { fail++; log.innerHTML+=`<span style="color:var(--red)">✗ ${esc(e.desc)}: ${JSON.stringify((d.errors||d)).slice(0,80)}</span>\n`; }
-    }catch(err){ fail++; log.innerHTML+=`<span style="color:var(--red)">✗ ${esc(e.desc)}: ${err.message}</span>\n`; }
+      const r=await fetch('https://secure.splitwise.com/api/v3.0/create_expense',{method:'POST',headers:{Authorization:'Bearer '+apiKey,'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const d=await r.json();
+      if(r.ok&&d.expenses&&d.expenses.length){e.sent=true;ok++;log.innerHTML+=`<span style="color:var(--green)">✓ ${esc(e.desc)} — $${e.importe.toLocaleString('es-AR')}</span>\n`;}
+      else{fail++;log.innerHTML+=`<span style="color:var(--red)">✗ ${esc(e.desc)}: ${JSON.stringify((d.errors||d)).slice(0,80)}</span>\n`;}
+    }catch(err){fail++;log.innerHTML+=`<span style="color:var(--red)">✗ ${esc(e.desc)}: ${err.message}</span>\n`;}
     log.scrollTop=log.scrollHeight;
     await new Promise(res=>setTimeout(res,350));
   }
-  updateStats(); document.getElementById('btnPush').disabled=false;
+  updateStats();document.getElementById('btnPush').disabled=false;
   document.getElementById('pushTxt').textContent=`Completado: ${ok} enviados, ${fail} errores.`;
-  toast(`${ok} gastos enviados a Splitwise 🎉`,'ok');
+  toast(`${ok} gastos enviados 🎉`,'ok');
 }
 
 function exportCSV(){
   if(!expenses.length){toast('No hay datos','warn');return;}
   const hdrs=['fecha','descripcion','original','importe','moneda','estado','categoria','fuente','enviado'];
-  const rows = expenses.map(e=>[e.fecha,e.desc,e.original,e.importe,e.moneda,e.status,e.categoria||'',e.source,e.sent?'SI':'NO']);
-  const csv = '\uFEFF'+[hdrs,...rows].map(r=>r.map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download='splitwise_gastos_'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+  const rows=expenses.map(e=>[e.fecha,e.desc,e.original,e.importe,e.moneda,e.status,e.categoria||'',e.source,e.sent?'SI':'NO']);
+  const csv='\uFEFF'+[hdrs,...rows].map(r=>r.map(c=>`"${(c||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='splitwise_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
   toast('CSV exportado','ok');
 }
 
+// ── Config ───────────────────────────────────────────────────────────────────
 function saveKey(){
-  apiKey = document.getElementById('apiIn').value.trim();
-  if(apiKey){ localStorage.setItem('sw_api_key',apiKey); updateApiUI(); toast('API key guardada','ok'); loadGroups(); }
+  apiKey=document.getElementById('apiIn').value.trim();
+  if(apiKey){localStorage.setItem('sw_api_key',apiKey);updateApiUI();toast('API key guardada','ok');loadGroups();}
   else toast('API key vacía','warn');
 }
-
 function updateApiUI(){
   const ok=!!apiKey;
   document.getElementById('hDot').className='dot '+(ok?'ok':'err');
   document.getElementById('hStatus').textContent=ok?'API conectada':'Sin API key';
 }
-
 function renderRules(){
-  const div=document.getElementById('rulesList'); div.innerHTML='';
+  const div=document.getElementById('rulesList');div.innerHTML='';
   rules.forEach((r,i)=>{
-    const row=document.createElement('div'); row.className='rule-row';
+    const row=document.createElement('div');row.className='rule-row';
     const bc=r.t==='shared'?'b-shared':r.t==='personal'?'b-personal':'b-review';
     const label=r.t==='shared'?'Compartido':r.t==='personal'?'Personal':'Revisar';
     row.innerHTML=`<span class="rule-kw">${esc(r.kw)}</span><div style="display:flex;align-items:center;gap:8px"><span class="badge ${bc}">${label}</span><button class="btn btn-sm btn-danger" onclick="removeRule(${i})">✕</button></div>`;
@@ -614,20 +656,29 @@ function addRule(){
   const t=document.getElementById('newType').value;
   if(!kw){toast('Ingresá una palabra clave','warn');return;}
   if(rules.find(r=>r.kw===kw)){toast('Regla ya existe','warn');return;}
-  rules.push({kw,t}); saveRules(); document.getElementById('newKw').value=''; renderRules(); toast('Regla agregada','ok');
+  rules.push({kw,t});saveRules();document.getElementById('newKw').value='';renderRules();toast('Regla agregada','ok');
 }
-function removeRule(i){ rules.splice(i,1); saveRules(); renderRules(); }
+function removeRule(i){rules.splice(i,1);saveRules();renderRules();}
+
+function switchTab(t){
+  const names=['upload','review','push','config'];
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',names[i]===t));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+t).classList.add('active');
+  if(t==='review') renderTable();
+  if(t==='push') renderPush();
+  if(t==='config') renderRules();
+}
 
 function toast(msg,type='info'){
   const t=document.getElementById('toast');
   const icons={ok:'✅',warn:'⚠️',err:'❌',info:'ℹ️'};
-  t.innerHTML=(icons[type]||'ℹ️')+' '+msg; t.classList.add('show');
-  clearTimeout(t._to); t._to=setTimeout(()=>t.classList.remove('show'),3000);
+  t.innerHTML=(icons[type]||'ℹ️')+' '+msg;t.classList.add('show');
+  clearTimeout(t._to);t._to=setTimeout(()=>t.classList.remove('show'),3500);
 }
 
 if(apiKey) document.getElementById('apiIn').value=apiKey;
-updateApiUI();
-renderTable();
+updateApiUI();renderTable();
 </script>
 </body>
 </html>
